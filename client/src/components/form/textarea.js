@@ -31,12 +31,12 @@ export default function Textarea({
     /**
      * @type {React.MutableRefObject<HTMLTextAreaElement>}
      */
-    const textareaRef = useRef() // Input reference
-    const [focused, setFocused] = useState(false) // Is input focused
-    const [inputAlert, setAlert] = useState(alert) // Input alert state
+    const textareaRef = useRef()
+    const [focused, setFocused] = useState(false)
+    const [inputAlert, setAlert] = useState(alert)
 
     useEffect(() => {
-        if (!textareaRef.current) return // If there is no input reference, return
+        if (!textareaRef.current) return
 
         const handleFocus = () => setFocused(true)
         const handleBlur = () => setFocused(false)
@@ -45,10 +45,10 @@ export default function Textarea({
         textareaRef.current.addEventListener('blur', handleBlur)
     }, [textareaRef])
 
-    useEffect(() => { // On value state change
-        if (textareaRef?.current) { // If there is an input
-            textareaRef.current.value = value // Set input value
-            onChange(value) // Trigger change event
+    useEffect(() => {
+        if (textareaRef?.current) {
+            textareaRef.current.value = value
+            onChange(value)
         }
     }, [value])
 

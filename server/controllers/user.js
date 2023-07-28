@@ -49,7 +49,7 @@ export const getUser = async (req, res) => {
             userId = decodedToken.userId
         } else userId = id
 
-        const user = await User.findById(userId, {password: 0}).populate('following', 'name email image')
+        const user = await User.findById(userId, {password: 0}).populate('following')
 
         if (!user || !user._id) return res.status(404).json({
             status: 'ERROR',
@@ -72,6 +72,9 @@ export const getUser = async (req, res) => {
             name: user.name,
             image: user.image,
             admin: user.admin,
+            activated: user.activated,
+            stream: user.stream,
+            following: user.following,
             createdAt: user.createdAt,
         }
 
@@ -379,6 +382,127 @@ export const postUpdateUser = async (req, res) => {
         res.status(500).json({
             status: 'ERROR',
             message: 'Kullanıcı güncellenirken bir hata meydana geldi.',
+            error: e.message,
+        })
+    }
+}
+
+export const postStartStream = async (req, res) => {
+    try {
+        const {id} = req.params
+        const {title, subject} = req.body
+
+        if (!id) return res.status(400).json({
+            status: 'ERROR',
+            message: 'ID verisi gereklidir.',
+        })
+
+        const user = await User.findById(id)
+
+        if (!user) return res.status(404).json({
+            status: 'ERROR',
+            message: 'Kullanıcı bulunamadı.',
+        })
+
+        if (user.stream) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Kullanıcı zaten yayın yapıyor.',
+        })
+
+        user.stream = {
+            title: typeof title === 'string' && title?.trim()?.length ? title : `${user.name}'in podcast yayını`,
+            subject: typeof subject === 'string' && subject?.trim()?.length ? subject : 'sohbet',
+        }
+        await user.save()
+
+        return res.status(200).json({
+            status: 'OK',
+            message: 'Podcast yayını başlatıldı.',
+            stream: user.stream,
+        })
+    } catch (e) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Podcast yayını başlatılırken bir hata meydana geldi.',
+            error: e.message,
+        })
+    }
+}
+
+export const postUpdateStream = async (req, res) => {
+    try {
+        const {id} = req.params
+        const {title, subject} = req.body
+
+        if (!id) return res.status(400).json({
+            status: 'ERROR',
+            message: 'ID verisi gereklidir.',
+        })
+
+        const user = await User.findById(id)
+
+        if (!user) return res.status(404).json({
+            status: 'ERROR',
+            message: 'Kullanıcı bulunamadı.',
+        })
+
+        if (!user.stream) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Kullanıcının aktif bir yayını yok.',
+        })
+
+        user.stream = {
+            title: typeof title === 'string' && title?.trim()?.length ? title : `${user.name}'in podcast yayını`,
+            subject: typeof subject === 'string' && subject?.trim()?.length ? subject : 'sohbet',
+        }
+        await user.save()
+
+        return res.status(200).json({
+            status: 'OK',
+            message: 'Podcast yayını güncellendi.',
+            stream: user.stream,
+        })
+    } catch (e) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Podcast yayını güncellenirken bir hata meydana geldi.',
+            error: e.message,
+        })
+    }
+}
+
+export const postCloseStream = async (req, res) => {
+    try {
+        const {id} = req.params
+
+        if (!id) return res.status(400).json({
+            status: 'ERROR',
+            message: 'ID verisi gereklidir.',
+        })
+
+        const user = await User.findById(id)
+
+        if (!user) return res.status(404).json({
+            status: 'ERROR',
+            message: 'Kullanıcı bulunamadı.',
+        })
+
+        if (!user.stream) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Kullanıcı zaten yayında değil.',
+        })
+
+        user.stream = null
+        await user.save()
+
+        return res.status(200).json({
+            status: 'OK',
+            message: 'Podcast yayını kapatıldı.',
+        })
+    } catch (e) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Podcast yayını kapatılırken bir hata meydana geldi.',
             error: e.message,
         })
     }

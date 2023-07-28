@@ -18,10 +18,18 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
     }],
+    stream: {
+        type: Object,
+        default: null,
+    },
     admin: {
         type: Boolean,
         default: false,
     },
+    activated: {
+        type: Boolean,
+        default: false,
+    }
 }, {
     timestamps: true,
 })

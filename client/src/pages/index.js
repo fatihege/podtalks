@@ -2,9 +2,19 @@ import Head from 'next/head'
 import styles from '@/styles/home.module.sass'
 import PodcastersGrid from '@/components/podcasters-grid'
 import StartStreamButton from '@/components/start-stream-button'
+import {useRouter} from 'next/router'
+import {useContext, useEffect} from 'react'
+import {AuthContext} from '@/contexts/auth'
 
 export default function Home() {
-    return (
+    const router = useRouter()
+    const [user] = useContext(AuthContext)
+
+    useEffect(() => {
+        if (user.loaded && (!user?.id || !user?.token)) router.push('/explore')
+    }, [user])
+
+    return user.loaded && user?.id && user?.token ? (
         <>
             <Head>
                 <title>PodTalks</title>
@@ -16,5 +26,5 @@ export default function Home() {
                 <PodcastersGrid title={'Önerilenler'} noMessage={'Sana önerebileceğimiz herhangi bir podcaster şu anda yok.'}/>
             </div>
         </>
-    )
+    ) : ''
 }

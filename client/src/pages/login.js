@@ -76,7 +76,7 @@ export default function Login() {
                     active: true,
                     title: 'Üzgünüz',
                     description: 'Hesabınıza giriş yaparken bir sorunla karşılaştık.',
-                    button: 'OK',
+                    button: 'Tamam',
                     type: ''
                 })
                 console.error(e)

@@ -32,12 +32,12 @@ export default function Input({
     /**
      * @type {React.MutableRefObject<HTMLInputElement>}
      */
-    const inputRef = useRef() // Input reference
-    const [focused, setFocused] = useState(false) // Is input focused
-    const [inputAlert, setAlert] = useState(alert) // Input alert state
+    const inputRef = useRef()
+    const [focused, setFocused] = useState(false)
+    const [inputAlert, setAlert] = useState(alert)
 
     useEffect(() => {
-        if (!inputRef.current) return // If there is no input reference, return
+        if (!inputRef.current) return
 
         const handleFocus = () => setFocused(true)
         const handleBlur = () => setFocused(false)
@@ -46,16 +46,16 @@ export default function Input({
         inputRef.current.addEventListener('blur', handleBlur)
     }, [inputRef])
 
-    useEffect(() => { // On value state change
-        if (inputRef?.current) { // If there is an input
-            inputRef.current.value = value // Set input value
-            onChange(value) // Trigger change event
+    useEffect(() => {
+        if (inputRef?.current) {
+            inputRef.current.value = value
+            onChange(value)
         }
     }, [value])
 
     return (
         <div
-            className={`${styles.input} ${focused ? styles.focused : ''} ${set?.current.length || inputRef.current?.value.length ? styles.filled : ''} ${inputAlert || alert ? styles.danger : ''} ${className}`}
+            className={`${styles.input} ${focused ? styles.focused : ''} ${set?.current.length || inputRef.current?.value.length || value?.length ? styles.filled : ''} ${inputAlert || alert ? styles.danger : ''} ${className}`}
             onClick={() => inputRef.current?.focus()}
             style={focused ? {zIndex: 1} : {}}>
             <span className={styles.placeholder}>{placeholder}</span>

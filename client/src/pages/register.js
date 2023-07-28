@@ -70,7 +70,7 @@ export default function Login() {
                     active: true,
                     title: 'Üzgünüz',
                     description: 'Hesabınız oluşturulurken bir sorun oluştu.',
-                    button: 'OK',
+                    button: 'Tamam',
                     type: ''
                 })
                 console.error(e)
