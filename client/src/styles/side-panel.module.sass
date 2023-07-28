@@ -1,0 +1,52 @@
+@import "variables"
+
+.sidePanel
+  width: 350px
+  height: 100%
+  background: #1c1c1c
+  border-right: 1px solid #262626
+  padding: 16px
+
+  .links
+    display: flex
+    flex-direction: column
+    color: #fff
+    font-weight: 600
+    font-size: 1rem
+    margin-bottom: 16px
+
+    a
+      display: block
+      padding: 8px 16px
+      margin-bottom: 4px
+      border-radius: 4px
+
+      &:hover
+        color: $accentColor
+        background-color: rgba(45, 45, 45, 0.7)
+
+      &.active
+        color: $accentColor
+
+  .followingSection
+    margin-top: 4px
+    padding-top: 4px
+    border-top: 1px solid #262626
+
+    h3
+      display: block
+      padding: 16px 16px
+      color: #d9d9d9
+      font-size: 1.2rem
+
+    span.noOne
+      display: block
+      color: rgba(217, 217, 217, .6)
+      font-weight: 500
+      font-size: .9rem
+      padding: 0 16px
+
+      a
+        color: #fff
+        font-weight: 600
+        opacity: 1

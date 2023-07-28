@@ -1,0 +1,160 @@
+@import "variables"
+
+.input
+  cursor: text
+  height: 56px
+  width: 300px
+  background-color: #1c1c1c
+  padding: .25rem .5rem
+  position: relative
+  border: 1px solid #262626
+  border-radius: 12px
+  margin-bottom: .5rem
+  transition: .15s ease-out
+  transition-property: background-color, border-color
+
+  &.focused
+    box-shadow: 0 0 0 4px rgba(0, 110, 241, .7)
+
+  &.focused,
+  &.filled
+    .placeholder
+      top: .5rem
+      left: .6rem
+      font-size: .8rem
+
+  &.danger
+    background-color: #ff5f5f
+    border-color: #ff3c3c
+    color: #252525
+
+    .placeholder
+      font-weight: 500
+      opacity: .8
+      color: #252525
+
+    input
+      color: #252525
+
+  .placeholder
+    position: absolute
+    top: 20px
+    left: .75rem
+    font-size: 1rem
+    line-height: 1rem
+    transition: .1s ease-out
+    transition-property: top, left, font-size
+    opacity: .5
+    color: #ffffff
+    font-weight: 400
+
+  .alert
+    cursor: pointer
+    position: absolute
+    right: .5rem
+    top: 18px
+    width: 18px
+    height: 18px
+    border: 1px solid #252525
+    color: #252525
+    border-radius: 8px
+    display: flex
+    justify-content: center
+    align-items: center
+    padding: 4px
+    font-size: .9rem
+    font-weight: 500
+    line-height: 1
+
+    &:hover ~ .alertMessage
+      display: block
+
+  .alertMessage
+    display: none
+    z-index: 3
+    position: absolute
+    right: .5rem
+    bottom: 45px
+    min-width: 100px
+    background-color: #1c1c1c
+    border: 1px solid #262626
+    color: rgba(255, 255, 255, .8)
+    padding: .25rem .5rem
+    font-size: .9rem
+    font-weight: 400
+    line-height: 1
+    border-radius: .9rem
+    pointer-events: none
+
+  &.textarea
+    height: max-content
+    min-height: 56px
+    padding-bottom: 1.5rem
+
+    textarea
+      resize: vertical
+      background: none
+      border: none
+      width: 100%
+      outline: none
+      color: rgba(255, 255, 255, .9)
+      font-size: 1rem
+      font-weight: 400
+      position: relative
+      top: 1.3rem
+      padding: .25rem
+
+  input
+    position: absolute
+    bottom: .3rem
+    left: .5rem
+    padding: .25rem
+    color: rgba(255, 255, 255, .9)
+    user-select: text
+    border: none
+    background: none
+    outline: none
+    font-size: 1rem
+    font-weight: 400
+    width: calc(100% - 1rem)
+
+.button
+  margin-top: 1rem
+  width: 300px
+  font-size: .9rem
+  font-weight: 500
+  border: none
+  border-radius: 12px !important
+  display: flex
+  justify-content: center
+  align-items: center
+  padding: 1.25rem 2rem
+  cursor: pointer
+  line-height: 1
+
+  &:disabled,
+  &.disabled
+    opacity: .5
+    pointer-events: none
+
+  &:active
+    opacity: .8
+
+  &.primary
+    background-color: $accentColor
+    color: #1c1c1c
+
+    &:hover
+      background-color: $accentColorDark
+
+  &.noBackground
+    background-color: transparent
+    color: rgba(255, 255, 255, .7)
+
+    &:hover
+      color: #ffffff
+
+  svg
+    margin-left: .25rem
+    width: 1rem
+    height: auto

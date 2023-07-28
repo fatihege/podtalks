@@ -1,0 +1,90 @@
+@import "variables"
+
+.podcastersGrid
+  margin-bottom: 32px
+
+  h2
+    font-size: 1.5rem
+    font-weight: 700
+    color: #efefef
+
+  .grid
+    display: flex
+    flex-wrap: wrap
+    margin-top: 16px
+    gap: 16px
+
+    &.empty
+      margin-top: 4px
+
+    .noPodcaster
+      font-size: .9rem
+      font-weight: 500
+      color: #eee
+      opacity: .8
+
+    .podcaster
+      color: #e0e0e0
+      width: 200px
+      display: flex
+      flex-direction: column
+      align-items: center
+      justify-content: center
+      height: 240px
+      background-color: rgba(28, 28, 28, 0.8)
+      border-radius: 8px
+      padding: 16px
+      cursor: pointer
+      position: relative
+      border: 2px solid transparent
+      transition: border-color .15s ease-out
+
+      &:hover
+        border-color: $accentColor
+
+        .podcasterImage
+          transform: scale(1.05)
+
+      .liveTag
+        position: absolute
+        top: 16px
+        left: 16px
+        background: #fd1a1a
+        color: #ffffff
+        font-weight: 600
+        font-size: .8rem
+        display: inline-block
+        padding: 2px 5px 2px 4px
+        border-radius: 4px
+        text-transform: uppercase
+        z-index: 2
+
+      .podcasterImage
+        height: 130px
+        width: 130px
+        margin-bottom: 16px
+        border-radius: 8px
+        transition: transform .15s ease-in-out
+
+        img
+          height: 100%
+          width: 100%
+          border-radius: 8px
+
+      .podcasterInfo
+        text-align: center
+
+        h3
+          font-size: 1.1rem
+          font-weight: 600
+          color: #efefef
+          text-align: center
+          max-width: 150px
+          overflow-x: hidden
+          text-overflow: ellipsis
+
+        span
+          font-size: .8rem
+          font-weight: 500
+          color: rgba(218, 218, 218, .8)
+          text-align: center

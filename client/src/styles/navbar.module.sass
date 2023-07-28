@@ -1,0 +1,187 @@
+@import "variables"
+
+.navbar
+  width: 100%
+  height: 52px
+  background-color: #1e1e1e
+  border-bottom: 1px solid #262626
+  position: relative
+  padding: 0 24px 0 16px
+  display: grid
+  grid-template-columns: repeat(3, 1fr)
+
+  .left
+    height: 100%
+    display: flex
+    align-items: center
+    column-gap: 1rem
+    padding: 8px 0
+
+    .logo
+      height: 100%
+
+      svg
+        height: 100%
+        width: auto
+        display: block
+
+    .links
+      display: flex
+      color: #fff
+      font-weight: 600
+      font-size: 1rem
+
+      a
+        &:hover,
+        &.active
+          color: $accentColor
+
+  .searchBox
+    height: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    padding: 8px 0
+
+    .searchInput
+      display: flex
+      align-items: center
+      border-radius: 8px
+      overflow: hidden
+      border: 1px solid #3a3a3a
+      width: 286px
+
+      input
+        height: 34px
+        width: 250px
+        padding: 4px 8px
+        border: none
+        background-color: #252525
+        color: #ffffff
+        font-weight: 500
+        font-size: .9rem
+        
+        &:focus
+          background-color: #212121
+
+      button
+        height: 34px
+        width: 36px
+        background-color: #313131
+        border: none
+        padding: 4px
+        cursor: pointer
+
+        &:hover
+          background-color: $accentColor
+
+          svg *
+            stroke: #1c1c1c !important
+
+        svg *
+          stroke: #ffffff !important
+
+
+  .account
+    display: flex
+    align-items: center
+    justify-content: flex-end
+    height: 100%
+
+    .links
+      display: flex
+      color: #fff
+      font-weight: 600
+      font-size: 1rem
+      column-gap: 1rem
+
+      a:hover
+        color: $accentColor
+
+    .profile
+      display: flex
+      align-items: center
+      column-gap: .5rem
+      cursor: pointer
+      padding: 4px 8px
+      border-radius: 4px
+
+      &:hover,
+      &.active
+        background-color: rgba(44, 44, 44, .8)
+
+      .userName
+        font-weight: 600
+        font-size: .9rem
+        color: #eee
+        max-width: 80px
+        overflow: hidden
+        text-overflow: ellipsis
+
+      .profileImage
+        width: 34px
+        height: 34px
+        border-radius: 50%
+        overflow: hidden
+
+        img
+          width: 100%
+          height: 100%
+          object-fit: cover
+          display: block
+
+        svg
+          width: 100%
+          height: auto
+
+      .menu
+        position: absolute
+        top: 56px
+        right: 24px
+        width: 150px
+        padding: .5rem
+        background-color: #0c0c0c
+        border-radius: .5rem
+        cursor: default
+        box-shadow: 0 5px 10px 0 rgba(5, 5, 5, .4)
+        display: none
+
+        &.show
+          display: block
+
+        ul
+          list-style-type: none
+          display: flex
+          flex-direction: column
+          justify-content: center
+          align-items: flex-start
+          row-gap: .25rem
+
+          li
+            display: block
+            width: 100%
+            border-radius: .25rem
+
+            &:not(.separator):hover
+              background-color: rgba(37, 37, 37, .5)
+
+            &:not(.separator):active
+              background-color: rgba(37, 37, 37, .3)
+
+            &.separator
+              padding: 0
+              width: 100%
+              height: 1px
+              background: rgba(108, 108, 108, .2)
+
+            a,
+            span
+              display: inline-block
+              width: 100%
+              padding: .25rem .75rem
+              margin: .1rem 0
+              line-height: 1.5
+              font-size: .9rem
+              font-weight: 500
+              color: rgba(255, 255, 255, .9)
+              cursor: pointer
