@@ -19,7 +19,6 @@ const io = new Server(server, {
 app.use(bodyParser.json())
 app.use(cors())
 
-
 app.use('/user', userRoutes)
 
 app.get('/', (req, res) => {

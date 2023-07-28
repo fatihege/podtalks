@@ -45,7 +45,8 @@ export default function Login() {
     }, [alertRef.current])
 
     const handleSubmit = async () => {
-        if (alertRef.current.name || alertRef.current.email || alertRef.current.password || alertRef.current.passwordConfirm) return
+        if (alertRef.current.name || alertRef.current.email || alertRef.current.password || alertRef.current.passwordConfirm || disableSubmit) return
+        setDisableSubmit(true)
 
         try {
             const response = await axios.post(`${process.env.API_URL}/user/signup`, {
@@ -56,7 +57,15 @@ export default function Login() {
             })
 
             if (response.data?.status === 'OK') {
-                setUser({loaded: true, ...response.data.user})
+                if (!response.data?.user) setAlertPopup({
+                        active: true,
+                        title: 'Onay postası gönderildi',
+                        description: 'Hesabınız oluşturuldu, e-posta adresinize gönderdiğimiz onay postasından hesabınızı aktif hale getirebilirsiniz.',
+                        button: 'Tamam',
+                        type: 'primary'
+                    })
+                else setUser({loaded: true, ...response.data.user})
+
                 router.push('/')
             } else throw new Error()
         } catch (e) {
@@ -75,6 +84,8 @@ export default function Login() {
                 })
                 console.error(e)
             }
+        } finally {
+            setDisableSubmit(false)
         }
     }
 

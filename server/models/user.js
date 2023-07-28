@@ -29,7 +29,8 @@ const UserSchema = new Schema({
     activated: {
         type: Boolean,
         default: false,
-    }
+    },
+    activationToken: String,
 }, {
     timestamps: true,
 })

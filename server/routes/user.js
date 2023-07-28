@@ -2,6 +2,7 @@ import express from 'express'
 import {
     getUser,
     postRegisterUser,
+    postActivateUser,
     postLoginUser,
     postUpdateProfile,
     postUpdateUser,
@@ -15,6 +16,7 @@ const router = express.Router()
 router.get('/', getUser)
 router.get('/:token', getUser)
 router.post('/signup', postRegisterUser)
+router.post('/activate/:token', postActivateUser)
 router.post('/login', postLoginUser)
 router.post('/update-profile/:id', profilePhotoUpload.single('image'), postUpdateProfile)
 router.post('/update/:id', postUpdateUser)

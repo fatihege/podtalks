@@ -7,6 +7,8 @@ import User from '../models/user.js'
 import authenticate from '../utils/authenticate.js'
 import {__dirname} from '../utils/dirname.js'
 import {checkPassword, checkUserName} from '../utils/checkers.js'
+import transporter from '../lib/mailer.js'
+import sendActivationMail from '../utils/send-activation-mail.js'
 
 const returnErrors = (errors, res) => {
     if (errors.length) {
@@ -141,23 +143,123 @@ export const postRegisterUser = async (req, res) => {
 
         if (returnErrors(errors, res)) return
 
+        const activationToken = jwt.sign({email}, process.env.JWT_KEY, {expiresIn: '1h'})
         const encryptedPassword = encrypt(password)
         const count = await User.count({})
-        const user = new User({name, email, password: encryptedPassword, admin: !count})
+        const user = new User({name, email, password: encryptedPassword, admin: !count, activationToken})
 
         await user.save()
 
-        const auth = await authenticate(email, password)
+        let auth = null
+        if (!count) auth = await authenticate(email, password)
+        else sendActivationMail({
+                email,
+                subject: 'PodTalks Hesabınızı Aktifleştirin',
+                html: `
+                    <h1>PodTalks</h1>
+                    <p>Merhaba ${name},</p>
+                    <p>Hesabınızı aktifleştirmek için aşağıdaki linke tıklayın.</p>
+                    <a href="${process.env.APP_URL}/activate/${activationToken}">${process.env.APP_URL}/activate/${activationToken}</a>
+                `,
+                text: `
+                    PodTalks\n
+                    Merhaba ${name},\n
+                    Hesabınızı aktifleştirmek için aşağıdaki linke tıklayın.\n
+                    ${process.env.APP_URL}/activate/${activationToken}
+                `
+            }, (err) => {
+                if (err) throw err
+            })
 
-        res.status(201).json({
+        res.status(200).json({
             status: 'OK',
             message: 'Kullanıcı oluşturuldu.',
-            user: {...auth},
+            user: auth ? {...auth} : null,
         })
     } catch (e) {
         res.status(500).json({
             status: 'ERROR',
             message: 'Kullanıcı oluşturulurken bir hata meydana geldi.',
+            error: e?.message || e,
+        })
+    }
+}
+
+export const postActivateUser = async (req, res) => {
+    try {
+        const {token} = req.params
+
+        if (!token) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Token gereklidir.',
+        })
+
+        jwt.verify(token, process.env.JWT_KEY, async (err, decoded) => {
+            // Recreate token if expired
+            if (err?.message === 'jwt expired') {
+                const user = await User.findOne({activationToken: token})
+
+                if (!user) return res.status(404).json({
+                    status: 'ERROR',
+                    message: 'Kullanıcı bulunamadı.',
+                })
+
+                const activationToken = jwt.sign({email: user.email}, process.env.JWT_KEY, {expiresIn: '1h'})
+
+                user.activationToken = activationToken
+                await user.save()
+
+                sendActivationMail({
+                    email: user.email,
+                    subject: 'PodTalks Hesabınızı Aktifleştirin',
+                    html: `
+                    <h1>PodTalks</h1>
+                    <p>Merhaba ${user.name},</p>
+                    <p>Hesabınızı aktifleştirmek için aşağıdaki linke tıklayın.</p>
+                    <a href="${process.env.APP_URL}/activate/${activationToken}">${process.env.APP_URL}/activate/${activationToken}</a>
+                `,
+                    text: `
+                    PodTalks\n
+                    Merhaba ${user.name},\n
+                    Hesabınızı aktifleştirmek için aşağıdaki linke tıklayın.\n
+                    ${process.env.APP_URL}/activate/${activationToken}
+                `
+                }, (err) => {
+                    if (err) throw err
+                })
+
+                return res.status(400).json({
+                    status: 'ERROR',
+                    message: 'Token süresi doldu.',
+                })
+            }
+
+            if (err) return res.status(400).json({
+                status: 'ERROR',
+                message: 'Token geçersiz.',
+            })
+
+            const user = await User.findOne({email: decoded.email})
+
+            if (!user) return res.status(404).json({
+                status: 'ERROR',
+                message: 'Kullanıcı bulunamadı.',
+            })
+
+            user.activationToken = null
+            user.activated = true
+            await user.save()
+
+            res.status(200).json({
+                status: 'OK',
+                message: 'Kullanıcı aktifleştirildi.',
+            })
+        })
+    } catch (e) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Kullanıcı aktifleştirilirken bir hata meydana geldi.',
+            error: e.message,
         })
     }
 }
@@ -200,6 +302,13 @@ export const postLoginUser = async (req, res) => {
 
         if (returnErrors(errors, res)) return
 
+        if (!user.activated && !user.admin) errors.push({
+            field: 'email',
+            message: 'Bu hesap henüz aktif değil. Lütfen e-posta adresinize gönderilen aktivasyon linkine tıklayarak hesabınızı aktif edin.',
+        })
+
+        if (returnErrors(errors, res)) return
+
         const auth = await authenticate(email, encryptedPassword || user.password, !!encryptedPassword, user)
 
         res.status(200).json({
@@ -211,6 +320,7 @@ export const postLoginUser = async (req, res) => {
         res.status(500).json({
             status: 'ERROR',
             message: 'Kullanıcı yetkilendirilirken bir hata meydana geldi.',
+            error: e.message,
         })
     }
 }

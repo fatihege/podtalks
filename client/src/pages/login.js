@@ -53,7 +53,8 @@ export default function Login() {
     const checkPassword = () => setAlert({...alertRef.current, password: null})
 
     const handleSubmit = async () => {
-        if (alert.email || alert.password) return
+        if (alert.email || alert.password || disableSubmit) return
+        setDisableSubmit(true)
 
         try {
             const response = await axios.post(`${process.env.API_URL}/user/login`, {
@@ -81,6 +82,8 @@ export default function Login() {
                 })
                 console.error(e)
             }
+        } finally {
+            setDisableSubmit(false)
         }
     }
 
