@@ -63,14 +63,14 @@ export default function Navbar() {
                                     <Link href={'/'} onClick={() => setShowMenu(false)}>Ayarlar</Link>
                                 </li>
                                 <li className={styles.separator}></li>
-                                <li>
-                                    <span onClick={handleLogout}>Çıkış yap</span>
-                                </li>
                                 {user.admin ? (
                                     <li>
                                         <Link href={'/admin'} onClick={() => setShowMenu(false)}>Admin paneli</Link>
                                     </li>
                                 ) : ''}
+                                <li>
+                                    <span onClick={handleLogout}>Çıkış yap</span>
+                                </li>
                             </ul>
                         </div>
                     </div>

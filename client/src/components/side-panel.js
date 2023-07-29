@@ -23,9 +23,9 @@ export default function SidePanel() {
                 <div className={styles.following}>
                     {user.loaded && user?.id && user?.token ? (
                         <span className={styles.noOne}>Takip ettiğiniz bir podcaster yok.</span>
-                    ) : (
+                    ) : user.loaded && (!user?.id || !user?.token) ? (
                         <span className={styles.noOne}>Takip etmek için <Link href={'/login'}>giriş yapın</Link>.</span>
-                    )}
+                    ) : ''}
                 </div>
             </div>
         </div>

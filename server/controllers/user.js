@@ -345,7 +345,7 @@ export const postForgotPassword = async (req, res) => {
             field: 'email',
             message: 'Bu e-posta adresine ait bir kullanıcı bulunamadı.',
         })
-        else if (!user.activated) errors.push({
+        else if (!user.activated && !user.admin) errors.push({
             field: 'email',
             message: 'Bu hesap henüz aktif değil. Lütfen e-posta adresinize gönderilen aktivasyon linkine tıklayarak hesabınızı aktif edin.',
         })
