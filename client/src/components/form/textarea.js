@@ -26,7 +26,7 @@ export default function Textarea({
     alert = null,
     onChange = () => {},
     onBlur = () => {},
-    validator = () => {}
+    validator = () => {},
 }) {
     /**
      * @type {React.MutableRefObject<HTMLTextAreaElement>}
@@ -54,7 +54,7 @@ export default function Textarea({
 
     return (
         <div
-            className={`${styles.input} ${styles.textarea} ${focused ? styles.focused : ''} ${set?.current.length || textareaRef.current?.value.length ? styles.filled : ''} ${inputAlert || alert ? styles.danger : ''} ${className}`}
+            className={`${styles.input} ${styles.textarea} ${focused ? styles.focused : ''} ${set?.current?.length || textareaRef.current?.value.length ? styles.filled : ''} ${inputAlert || alert ? styles.danger : ''} ${className}`}
             onClick={() => textareaRef.current?.focus()}
             style={focused ? {zIndex: 1} : {}}>
             <span className={styles.placeholder}>{placeholder}</span>

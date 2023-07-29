@@ -553,7 +553,7 @@ export const postUpdateProfile = async (req, res) => {
 export const postUpdateUser = async (req, res) => {
     try {
         const {id} = req.params
-        const {name, email, currentPassword, newPassword, passwordConfirm} = req.body
+        const {name, email, bio, currentPassword, newPassword, passwordConfirm} = req.body
 
         if (!id) return res.status(400).json({
             status: 'ERROR',
@@ -600,6 +600,8 @@ export const postUpdateUser = async (req, res) => {
            
             user.name = newName
             user.email = newEmail
+            if (bio?.trim()?.length) user.bio = bio.trim()
+            else user.bio = null
 
             await user.save()
 

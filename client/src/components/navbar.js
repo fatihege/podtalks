@@ -63,7 +63,7 @@ export default function Navbar() {
                                     <Link href={'/profile/[id]'} as={`/profile/${user.id}`}>Profil</Link>
                                 </li>
                                 <li>
-                                    <Link href={'/account'}>Ayarlar</Link>
+                                    <Link href={'/account'}>Hesap</Link>
                                 </li>
                                 <li className={styles.separator}></li>
                                 {user.admin ? (
