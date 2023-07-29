@@ -48,7 +48,7 @@ export default function Navbar() {
                 </div>
             </div>
             <div className={styles.account}>
-                {user.loaded ? <StartStreamButton/> : ''}
+                {user.loaded && !router.asPath.startsWith('/stream/') ? <StartStreamButton/> : ''}
                 {user.loaded && user?.id ? (
                     <div className={`${styles.profile} ${showMenu.current ? styles.active : ''}`}
                          onClick={() => handleShowMenu()}>

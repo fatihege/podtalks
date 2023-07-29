@@ -4,6 +4,7 @@ const nextConfig = {
     env: {
         API_URL: 'http://localhost:3001',
         IMAGE_CDN: 'http://localhost:3001/image',
+        WS_URL: 'http://localhost:3001',
     }
 }
 

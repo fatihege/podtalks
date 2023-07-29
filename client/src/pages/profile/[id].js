@@ -109,11 +109,20 @@ export default function Profile({id}) {
                         <div className={styles.profileAction}>
                             {user?.id === profile?.id ?
                                 (<Link href={'/account'} className={styles.editLink}>Profili Düzenle</Link>) :
-                                (<button className={`${styles.followButton} ${isFollowing ? styles.unfollow : ''}`}
-                                         disabled={disableFollow}
-                                         onClick={() => handleFollow()}>
-                                    {isFollowing === true ? 'Takibi bırak' : isFollowing === false ? 'Takip et' : '...'}
-                                </button>)}
+                                (
+                                    <>
+                                        <button className={`${styles.followButton} ${isFollowing ? styles.unfollow : ''}`}
+                                                 disabled={disableFollow}
+                                                 onClick={() => handleFollow()}>
+                                            {isFollowing === true ? 'Takibi bırak' : isFollowing === false ? 'Takip et' : '...'}
+                                        </button>
+                                        {profile?.stream ? (
+                                            <Link href={'/stream/[id]'} as={`/stream/${profile?.id}`} className={styles.goLiveButton}>
+                                                Yayını dinle
+                                            </Link>
+                                        ) : ''}
+                                    </>
+                                )}
                         </div>
                     ) : ''}
                 </div>

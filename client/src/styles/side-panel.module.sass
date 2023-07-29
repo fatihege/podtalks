@@ -32,10 +32,18 @@
     margin-top: 4px
     padding-top: 4px
     border-top: 1px solid #262626
+    overflow: auto
+    max-height: 80vh
+
+    &::-webkit-scrollbar
+      background-color: #1c1c1c
+
+    &::-webkit-scrollbar-thumb
+      border-color: #1c1c1c
 
     h3
       display: block
-      padding: 16px 16px
+      padding: 16px 16px 8px 16px
       color: #d9d9d9
       font-size: 1.2rem
 
@@ -44,9 +52,53 @@
       color: rgba(217, 217, 217, .6)
       font-weight: 500
       font-size: .9rem
-      padding: 0 16px
+      padding: 8px 16px
 
       a
         color: #fff
         font-weight: 600
         opacity: 1
+
+    .followingItem
+      display: flex
+      padding: 6px 12px
+      border-radius: 4px
+      column-gap: 8px
+      align-items: center
+
+      &:hover
+        background-color: rgba(45, 45, 45, 0.7)
+
+      .podcasterImage
+        width: 32px
+        height: 32px
+        overflow: hidden
+        border-radius: 50%
+
+        img
+          width: 100%
+          height: 100%
+          object-fit: cover
+
+        svg
+          width: 100%
+          height: auto
+
+      .podcasterName
+        font-size: 1rem
+        font-weight: 600
+        color: #eeeeee
+        max-width: 130px
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+
+      .liveTag
+        background: #fd1a1a
+        color: #ffffff
+        font-weight: 600
+        font-size: .8rem
+        display: inline-block
+        padding: 2px 5px 2px 4px
+        border-radius: 4px
+        text-transform: uppercase
