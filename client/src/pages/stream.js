@@ -82,14 +82,10 @@ export default function Stream() {
     }
 
     useEffect(() => {
-        console.log(title.current, subject.current)
-    }, [title.current, subject.current])
-
-    useEffect(() => {
         sureRef.current = sure
         if (sure === 1) {
             clearTimeout(timeoutRef.current)
-            timeoutRef.current = setTimeout(() => sureRef.current !== 2 ? setSure(0) : closeStream(), 5000)
+            timeoutRef.current = setTimeout(() => sureRef.current !== 2 ? setSure(0) : closeStream(), 3000)
         }
     }, [sure])
 

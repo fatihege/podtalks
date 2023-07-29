@@ -12,7 +12,7 @@ import {
     postStartStream,
     postCloseStream, postUpdateStream, postFollow, postUnfollow
 } from '../controllers/user.js'
-import {profilePhotoUpload} from '../lib/multer.js'
+import multer from '../lib/multer.js'
 
 const router = express.Router()
 
@@ -24,7 +24,7 @@ router.post('/login', postLoginUser)
 router.post('/forgot-password', postForgotPassword)
 router.post('/check-password-token/:token', postCheckPasswordToken)
 router.post('/reset-password/:token', postResetPassword)
-router.post('/update-profile/:id', profilePhotoUpload.single('image'), postUpdateProfile)
+router.post('/update-profile/:id', multer.single('image'), postUpdateProfile)
 router.post('/update/:id', postUpdateUser)
 router.post('/start-stream/:id', postStartStream)
 router.post('/update-stream/:id', postUpdateStream)

@@ -9,6 +9,8 @@ import Button from '@/components/form/button'
 import {checkNameField, checkEmailField, checkPasswordField, checkPasswordConfirmField} from '@/utils/checkers'
 import styles from '@/styles/account.module.sass'
 import Textarea from '@/components/form/textarea'
+import DefaultProfile from '@/icons/default-profile'
+import AddIcon from '@/icons/add'
 
 export default function AccountPage() {
     const router = useRouter()
@@ -20,8 +22,10 @@ export default function AccountPage() {
     const currentPassword = useRef('')
     const newPassword = useRef('')
     const passwordConfirm = useRef('')
+    const [disableImageSubmit, setDisableImageSubmit] = useState(false)
     const [disableInformationSubmit, setDisableInformationSubmit] = useState(false)
     const [disablePasswordSubmit, setDisablePasswordSubmit] = useState(false)
+    const fileRef = useRef()
     const [alert, _setAlert] = useState({
         name: null,
         email: null,
@@ -46,10 +50,6 @@ export default function AccountPage() {
         else setDisablePasswordSubmit(false)
     }, [alertRef.current])
 
-    const handleBioChange = value => {
-        if (value !== user.bio) setDisableInformationSubmit(false)
-    }
-
     useEffect(() => {
         if (!user.loaded) return
 
@@ -62,6 +62,61 @@ export default function AccountPage() {
         email.current = user.email
         bio.current = user.bio
     }, [user])
+
+    const triggerFileInput = () => {
+        if (!disableImageSubmit) fileRef.current?.click()
+    }
+
+    const handleFileSelect = async e => {
+        if (disableImageSubmit) return
+
+        const file = e.target.files[0]
+        if (!file) return
+
+        if (file.size > 2000000) return setAlert({
+            active: true,
+            title: 'Limitler aşıldı',
+            description: 'Profil fotoğrafı boyutu 2MB\'dan büyük olamaz.',
+            button: 'Tamam',
+            type: '',
+        })
+
+        await updateProfilePhoto(file)
+    }
+
+    const updateProfilePhoto = async (file, noImage = false) => {
+        if (!user?.loaded || !user?.id || !user?.token) return
+
+        try {
+            setDisableImageSubmit(true)
+            const formData = new FormData()
+            if (!noImage) formData.append('image', file)
+            else formData.append('noImage', 'true')
+
+            const response = await axios.post(`${process.env.API_URL}/user/update-profile/${user.id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+
+            if (response.data?.status === 'OK') return router.reload()
+            else throw new Error()
+        } catch (e) {
+            setAlertPopup({
+                active: true,
+                title: 'Bir sorun oluştu',
+                description: 'Profil fotoğrafınız güncellenirken bir hata oluştu. Daha sonra tekrar deneyin.',
+                button: 'Tamam',
+                type: ''
+            })
+            console.error(e)
+            setDisableImageSubmit(false)
+        }
+    }
+
+    const handleBioChange = value => {
+        if (value !== user.bio) setDisableInformationSubmit(false)
+    }
 
     const handleInformationSubmit = async () => {
         if (!user?.loaded) return
@@ -116,7 +171,6 @@ export default function AccountPage() {
             })
 
             if (response.data.status === 'OK') {
-               
                 currentPassword.current = ''
                 newPassword.current = ''
                 passwordConfirm.current = ''
@@ -157,6 +211,24 @@ export default function AccountPage() {
             </Head>
             <div className={styles.container}>
                 <div className={styles.content}>
+                    <h1 className={styles.pageTitle}>Profil fotoğrafı</h1>
+                    <div className={styles.form}>
+                        <div className={styles.profile}>
+                            <div className={styles.profileImage}>
+                                {user?.image ? <img src={`${process.env.IMAGE_CDN}/${user.image}`} alt={user.name}/> : <DefaultProfile/>}
+                                <div className={styles.overlay} onClick={() => triggerFileInput()}>
+                                    <AddIcon/>
+                                    Yükle
+                                </div>
+                            </div>
+                            {user?.image && (
+                                <button className={styles.removeImage} onClick={() => updateProfilePhoto(null, true)}>
+                                    Kaldır
+                                </button>
+                            )}
+                            <input type="file" ref={fileRef} className="hide" onChange={handleFileSelect} accept=".png,.jpg,.jpeg"/>
+                        </div>
+                    </div>
                     <h1 className={styles.pageTitle}>Hesap bilgileri</h1>
                     <div className={styles.form}>
                         {user.loaded ? (

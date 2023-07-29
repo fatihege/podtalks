@@ -119,10 +119,10 @@ export default function Profile({id}) {
                 </div>
                 <div className={styles.tabs}>
                     <button className={`${styles.tab} ${activeTab === 1 ? styles.active : ''}`}
-                            onClick={() => handleTab(1)}>{profile?.followers?.length} Takipçi
+                            onClick={() => handleTab(1)}>{profile?.followers?.length} takipçi
                     </button>
                     <button className={`${styles.tab} ${activeTab === 2 ? styles.active : ''}`}
-                            onClick={() => handleTab(2)}>{profile?.following?.length} Takip edilen
+                            onClick={() => handleTab(2)}>{profile?.following?.length} takip edilen
                     </button>
                 </div>
                 <div className={styles.tabContent}>
