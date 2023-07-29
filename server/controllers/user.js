@@ -58,26 +58,30 @@ export const getUser = async (req, res) => {
         })
 
         let result = {}
-
-        if (props && props.split(',').length) {
-            for (let prop of props.split(',')) {
-                const propName = prop.trim().startsWith('count:') ? prop.trim().slice('count:'.length).trim() : prop.trim()
-                if (propName === 'followers') {
-                    result[propName] = await getFollowers(user._id, prop.trim().startsWith('count:'))
-                } else if (typeof user[propName] !== 'undefined' && !prop.includes('password'))
-                    result[propName] = prop.startsWith('count:') ? user[propName]?.length : user[propName]
-            }
-        } else result = {
+        const defaultResult = {
             id: user._id,
             email: user.email,
             name: user.name,
             image: user.image,
+            bio: user.bio,
             admin: user.admin,
             activated: user.activated,
             stream: user.stream,
             following: user.following,
             createdAt: user.createdAt,
         }
+
+        if (props && props.split(',').length) {
+            for (let prop of props.split(',')) {
+                const propName = prop.trim().startsWith('count:') ? prop.trim().slice('count:'.length).trim() : prop.trim()
+                if (propName === 'followers')
+                    result[propName] = await getFollowers(user._id, prop.trim().startsWith('count:'))
+                else if (propName.trim() === '*')
+                    result = {...result, ...defaultResult}
+                else if (typeof user[propName] !== 'undefined' && !prop.includes('password'))
+                    result[propName] = prop.startsWith('count:') ? user[propName]?.length : user[propName]
+            }
+        } else result = defaultResult
 
         res.status(200).json({
             status: 'OK',

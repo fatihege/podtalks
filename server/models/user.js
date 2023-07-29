@@ -14,6 +14,7 @@ const UserSchema = new Schema({
         type: String,
         required: true,
     },
+    bio: String,
     following: [{
         type: Schema.Types.ObjectId,
         ref: 'User',

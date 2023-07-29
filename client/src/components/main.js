@@ -4,11 +4,12 @@ import Navbar from '@/components/navbar'
 import SidePanel from '@/components/side-panel'
 
 export default function Main({children}) {
-    const [menuRef, showMenu, setShowMenu] = useContext(NavigationBarContext) // Get account menu references from the navigation bar context
+    const [menuRef, showMenu, setShowMenu] = useContext(NavigationBarContext)
 
     useEffect(() => {
         const handleClick = e => {
-            if (showMenu.current && menuRef.current && !menuRef.current.parentNode.contains(e.target)) setShowMenu(false) // If the account menu is shown and the parent node of the account menu is not contains the event target, close the account menu
+            if (showMenu.current && menuRef.current && !menuRef.current.parentNode.contains(e.target)) setShowMenu(false)
+            else if (e.target.tagName === 'A' && menuRef.current?.contains(e.target)) setShowMenu(false)
         }
 
         window.addEventListener('click', handleClick)

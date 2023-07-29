@@ -7,6 +7,7 @@ import {useContext} from 'react'
 import {AuthContext} from '@/contexts/auth'
 import DefaultProfile from '@/icons/default-profile'
 import {NavigationBarContext} from '@/contexts/navigation-bar'
+import StartStreamButton from '@/components/start-stream-button'
 
 export default function Navbar() {
     const router = useRouter()
@@ -32,7 +33,8 @@ export default function Navbar() {
                     </Link>
                 </div>
                 <div className={styles.links}>
-                    <Link href={user.loaded && user?.id && user?.token ? '/following' : '/login'} className={router.asPath === '/following' ? styles.active : ''}>
+                    <Link href={user.loaded && user?.id && user?.token ? '/following' : '/login'}
+                          className={router.asPath === '/following' ? styles.active : ''}>
                         Takip Edilenler
                     </Link>
                 </div>
@@ -46,8 +48,10 @@ export default function Navbar() {
                 </div>
             </div>
             <div className={styles.account}>
+                {user.loaded ? <StartStreamButton/> : ''}
                 {user.loaded && user?.id ? (
-                    <div className={`${styles.profile} ${showMenu.current ? styles.active : ''}`} onClick={() => handleShowMenu()}>
+                    <div className={`${styles.profile} ${showMenu.current ? styles.active : ''}`}
+                         onClick={() => handleShowMenu()}>
                         <div className={styles.userName}>{user?.name}</div>
                         <div className={styles.profileImage}>
                             {user?.image ? <img src={`${process.env.IMAGE_CDN}/${user.image}`} alt={user?.name}/> :
@@ -56,16 +60,15 @@ export default function Navbar() {
                         <div className={`${styles.menu} ${showMenu.current ? styles.show : ''}`} ref={menuRef}>
                             <ul>
                                 <li>
-                                    <Link href={'/profile/[id]'} as={`/profile/${user.id}`}
-                                          onClick={() => setShowMenu(false)}>Profil</Link>
+                                    <Link href={'/profile/[id]'} as={`/profile/${user.id}`}>Profil</Link>
                                 </li>
                                 <li>
-                                    <Link href={'/'} onClick={() => setShowMenu(false)}>Ayarlar</Link>
+                                    <Link href={'/account'}>Ayarlar</Link>
                                 </li>
                                 <li className={styles.separator}></li>
                                 {user.admin ? (
                                     <li>
-                                        <Link href={'/admin'} onClick={() => setShowMenu(false)}>Admin paneli</Link>
+                                        <Link href={'/admin'}>Admin paneli</Link>
                                     </li>
                                 ) : ''}
                                 <li>
