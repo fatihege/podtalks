@@ -10,7 +10,7 @@ import {
     postUpdateProfile,
     postUpdateUser,
     postStartStream,
-    postCloseStream, postUpdateStream
+    postCloseStream, postUpdateStream, postFollow, postUnfollow
 } from '../controllers/user.js'
 import {profilePhotoUpload} from '../lib/multer.js'
 
@@ -29,5 +29,7 @@ router.post('/update/:id', postUpdateUser)
 router.post('/start-stream/:id', postStartStream)
 router.post('/update-stream/:id', postUpdateStream)
 router.post('/close-stream/:id', postCloseStream)
+router.post('/follow/:id', postFollow)
+router.post('/unfollow/:id', postUnfollow)
 
 export default router

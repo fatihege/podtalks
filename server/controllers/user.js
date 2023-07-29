@@ -795,3 +795,89 @@ export const postCloseStream = async (req, res) => {
         })
     }
 }
+
+export const postFollow = async (req, res) => {
+    try {
+        const {id} = req.params
+        const {userId} = req.body
+
+        if (!id) return res.status(400).json({
+            status: 'ERROR',
+            message: 'ID verisi gereklidir.',
+        })
+
+        if (!userId) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Kullanıcı ID verisi gereklidir.',
+        })
+
+        const user = await User.findById(id)
+
+        if (!user) return res.status(404).json({
+            status: 'ERROR',
+            message: 'Kullanıcı bulunamadı.',
+        })
+
+        if (user.following?.find(follow => follow.toString() === userId)) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Kullanıcı zaten takip ediliyor.',
+        })
+
+        user.following.push(userId)
+        await user.save()
+
+        return res.status(200).json({
+            status: 'OK',
+            message: 'Kullanıcı takip edildi.',
+        })
+    } catch (e) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Kullanıcı takip edilirken bir hata meydana geldi.',
+            error: e.message,
+        })
+    }
+}
+
+export const postUnfollow = async (req, res) => {
+    try {
+        const {id} = req.params
+        const {userId} = req.body
+
+        if (!id) return res.status(400).json({
+            status: 'ERROR',
+            message: 'ID verisi gereklidir.',
+        })
+
+        if (!userId) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Kullanıcı ID verisi gereklidir.',
+        })
+
+        const user = await User.findById(id)
+
+        if (!user) return res.status(404).json({
+            status: 'ERROR',
+            message: 'Kullanıcı bulunamadı.',
+        })
+
+        if (!user.following?.find(follow => follow.toString() === userId)) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Kullanıcı zaten takip edilmiyor.',
+        })
+
+        user.following = user.following.filter(follow => follow.toString() !== userId)
+        await user.save()
+
+        return res.status(200).json({
+            status: 'OK',
+            message: 'Kullanıcı takip edildi.',
+        })
+    } catch (e) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Kullanıcı takipten çıkılırken bir hata meydana geldi.',
+            error: e.message,
+        })
+    }
+}
