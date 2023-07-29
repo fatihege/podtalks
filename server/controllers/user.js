@@ -7,8 +7,7 @@ import User from '../models/user.js'
 import authenticate from '../utils/authenticate.js'
 import {__dirname} from '../utils/dirname.js'
 import {checkPassword, checkUserName} from '../utils/checkers.js'
-import transporter from '../lib/mailer.js'
-import sendActivationMail from '../utils/send-activation-mail.js'
+import sendMail from '../utils/send-mail.js'
 
 const returnErrors = (errors, res) => {
     if (errors.length) {
@@ -152,7 +151,7 @@ export const postRegisterUser = async (req, res) => {
 
         let auth = null
         if (!count) auth = await authenticate(email, password)
-        else sendActivationMail({
+        else sendMail({
                 email,
                 subject: 'PodTalks Hesabınızı Aktifleştirin',
                 html: `
@@ -195,7 +194,6 @@ export const postActivateUser = async (req, res) => {
         })
 
         jwt.verify(token, process.env.JWT_KEY, async (err, decoded) => {
-            // Recreate token if expired
             if (err?.message === 'jwt expired') {
                 const user = await User.findOne({activationToken: token})
 
@@ -209,7 +207,7 @@ export const postActivateUser = async (req, res) => {
                 user.activationToken = activationToken
                 await user.save()
 
-                sendActivationMail({
+                sendMail({
                     email: user.email,
                     subject: 'PodTalks Hesabınızı Aktifleştirin',
                     html: `
@@ -320,6 +318,180 @@ export const postLoginUser = async (req, res) => {
         res.status(500).json({
             status: 'ERROR',
             message: 'Kullanıcı yetkilendirilirken bir hata meydana geldi.',
+            error: e.message,
+        })
+    }
+}
+
+export const postForgotPassword = async (req, res) => {
+    try {
+        const {email} = req.body
+        const errors = []
+
+        if (!email?.trim().length) errors.push({
+            field: 'email',
+            message: 'Bir e-posta adresi girin.',
+        })
+        else if (!checkEmail(email)) errors.push({
+            field: 'email',
+            message: 'Girdiğiniz e-posta adresi geçersiz.',
+        })
+
+        if (returnErrors(errors, res)) return
+
+        const user = await User.findOne({email})
+
+        if (!user) errors.push({
+            field: 'email',
+            message: 'Bu e-posta adresine ait bir kullanıcı bulunamadı.',
+        })
+        else if (!user.activated) errors.push({
+            field: 'email',
+            message: 'Bu hesap henüz aktif değil. Lütfen e-posta adresinize gönderilen aktivasyon linkine tıklayarak hesabınızı aktif edin.',
+        })
+
+        if (returnErrors(errors, res)) return
+
+        const resetPasswordToken = jwt.sign({email}, process.env.JWT_KEY, {expiresIn: '1h'})
+        user.passwordResetToken = resetPasswordToken
+        await user.save()
+
+        sendMail({
+            email,
+            subject: 'PodTalks Şifre Sıfırlama',
+            html: `
+                <h1>PodTalks</h1>
+                <p>Merhaba ${user.name},</p>
+                <p>Şifrenizi sıfırlamak için aşağıdaki linke tıklayın.</p>
+                <a href="${process.env.APP_URL}/reset-password/${resetPasswordToken}">${process.env.APP_URL}/reset-password/${resetPasswordToken}</a>
+            `,
+            text: `
+                PodTalks\n
+                Merhaba ${user.name},\n
+                Şifrenizi sıfırlamak için aşağıdaki linke tıklayın.\n
+                ${process.env.APP_URL}/reset-password/${resetPasswordToken}
+            `
+        }, (err) => {
+            if (err) throw err
+        })
+
+        res.status(200).json({
+            status: 'OK',
+            message: 'Şifre sıfırlama maili gönderildi.',
+        })
+    } catch (e) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Şifre sıfırlama maili gönderilirken bir hata meydana geldi.',
+            error: e.message,
+        })
+    }
+}
+
+export const postCheckPasswordToken = async (req, res) => {
+    try {
+        const {token} = req.params
+
+        if (!token) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Token gereklidir.',
+        })
+
+        jwt.verify(token, process.env.JWT_KEY, async (err, decoded) => {
+            if (err) return res.status(400).json({
+                status: 'ERROR',
+                message: 'Token geçersiz.',
+            })
+
+            const user = await User.findOne({email: decoded.email})
+
+            if (!user) return res.status(404).json({
+                status: 'ERROR',
+                message: 'Kullanıcı bulunamadı.',
+            })
+
+            if (user.passwordResetToken !== token) return res.status(400).json({
+                status: 'ERROR',
+                message: 'Token geçersiz.',
+            })
+
+            res.status(200).json({
+                status: 'OK',
+                message: 'Token geçerli.',
+            })
+        })
+    } catch (e) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Şifre sıfırlama tokeni kontrol edilirken bir hata meydana geldi.',
+            error: e.message,
+        })
+    }
+}
+
+export const postResetPassword = async (req, res) => {
+    try {
+        const {token} = req.params
+        const errors = []
+
+        if (!token) return res.status(400).json({
+            status: 'ERROR',
+            message: 'Token gereklidir.',
+        })
+
+        jwt.verify(token, process.env.JWT_KEY, async (err, decoded) => {
+            if (err) return res.status(400).json({
+                status: 'ERROR',
+                message: 'Token geçersiz.',
+            })
+
+            const user = await User.findOne({email: decoded.email})
+
+            if (!user) return res.status(404).json({
+                status: 'ERROR',
+                message: 'Kullanıcı bulunamadı.',
+            })
+
+            if (user.passwordResetToken !== token) return res.status(400).json({
+                status: 'ERROR',
+                message: 'Token geçersiz.',
+            })
+
+            const {password, passwordConfirm} = req.body
+
+            if (!password?.trim().length) errors.push({
+                field: 'password',
+                message: 'Bir şifre girin.',
+            })
+            else if (!checkPassword(password)) errors.push({
+                field: 'password',
+                message: 'Yeni şifreniz çok kısa.',
+            })
+
+            if (!passwordConfirm?.trim().length) errors.push({
+                field: 'passwordConfirm',
+                message: 'Şifrenizi onaylayın.',
+            })
+            else if (password !== passwordConfirm) errors.push({
+                field: 'passwordConfirm',
+                message: 'Şifreler eşleşmiyor.',
+            })
+
+            if (returnErrors(errors, res)) return
+
+            user.password = encrypt(password)
+            user.passwordResetToken = null
+            await user.save()
+
+            res.status(200).json({
+                status: 'OK',
+                message: 'Şifre sıfırlandı.',
+            })
+        })
+    } catch (e) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Şifre sıfırlanırken bir hata meydana geldi.',
             error: e.message,
         })
     }

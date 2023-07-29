@@ -41,7 +41,7 @@ export default function Login() {
     }, [alertRef.current])
 
     const checkEmailField = () => {
-        if (!email.current) return setAlert({...alertRef.current, email: null})
+        if (!email.current?.length) return setAlert({...alertRef.current, email: null})
 
         if (!checkEmail(email.current)) setAlert({
             ...alertRef.current,
@@ -78,7 +78,7 @@ export default function Login() {
                     title: 'Üzgünüz',
                     description: 'Hesabınıza giriş yaparken bir sorunla karşılaştık.',
                     button: 'Tamam',
-                    type: ''
+                    type: '',
                 })
                 console.error(e)
             }
@@ -110,7 +110,7 @@ export default function Login() {
                 </div>
                 <div className={styles.extras}>
                     <span onClick={() => router.push('/register')}>Yeni bir hesap oluşturun</span>
-                    <Link href="/">Şifrenizi mi unuttunuz?</Link>
+                    <Link href={'/forgot-password'}>Şifrenizi mi unuttunuz?</Link>
                 </div>
             </div>
         </>

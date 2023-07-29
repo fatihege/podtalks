@@ -31,6 +31,7 @@ const UserSchema = new Schema({
         default: false,
     },
     activationToken: String,
+    passwordResetToken: String,
 }, {
     timestamps: true,
 })
