@@ -15,6 +15,7 @@ import {AudioRecorder, AudioStreamer} from 'jnaudiostream'
 import EyeIcon from '@/icons/eye'
 import CloseIcon from '@/icons/close'
 import AddIcon from '@/icons/add'
+import ChatIcon from '@/icons/chat'
 
 export function getServerSideProps(context) {
     return {
@@ -46,6 +47,8 @@ export default function StreamPanel({id}) {
     const [clicked, setClicked] = useState(false)
     const [chatClosed, setChatClosed] = useState(null)
     const [listeners, setListeners] = useState([])
+    const [showChat, setShowChat] = useState(false)
+    const [width, setWidth] = useState(null)
 
     const getStreamData = async () => {
         try {
@@ -73,7 +76,12 @@ export default function StreamPanel({id}) {
     }
 
     useEffect(() => {
+        window.addEventListener('resize', () => setWidth(window.innerWidth))
+        setWidth(window.innerWidth)
+
         return () => {
+            window.removeEventListener('resize', () => setWidth(window.innerWidth))
+
             if (socketRef.current) {
                 socketRef.current.emit('leaveStreamRoom', streamUser?.id)
                 socketRef.current.disconnect()
@@ -444,7 +452,12 @@ export default function StreamPanel({id}) {
                         </>
                     ) : ''}
                 </div>
-                <div className={styles.chatSide}>
+                {width <= 820 && (
+                    <button className={styles.chatToggle} onClick={() => setShowChat(!showChat)}>
+                        <ChatIcon stroke={'#1c1c1c'}/>
+                    </button>
+                )}
+                <div className={`${styles.chatSide} ${width <= 820 && !showChat ? styles.hide : ''}`}>
                     <div className={styles.chat} ref={chatRef}>
                         {chatLogs.map((log, index) => (
                             <div key={index} className={styles.log}>

@@ -1,13 +1,13 @@
 import {createContext, useRef, useState} from 'react'
 
-const NavigationBarContext = createContext(null) // Context for navigation bar
+const NavigationBarContext = createContext(null)
 
 const NavigationBarProvider = ({children}) => {
-    const [showMenu, _setShowMenu] = useState(false) // Is menu shown state
-    const menuRef = useRef() // Account menu reference
-    const showMenuRef = useRef(showMenu) // Show menu state reference
+    const [showMenu, _setShowMenu] = useState(false)
+    const menuRef = useRef()
+    const showMenuRef = useRef(showMenu)
 
-    const setShowMenu = value => { // Set the show menu state and the reference value
+    const setShowMenu = value => {
         showMenuRef.current = value
         _setShowMenu(value)
     }

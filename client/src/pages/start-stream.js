@@ -79,8 +79,8 @@ export default function StartStream() {
             <div className={styles.container}>
                 <h1 className={styles.pageTitle}>Podcast yayını başlatın</h1>
                 <div className={styles.streamInfo}>
-                    <Input type="text" set={title} placeholder={`Podcast başlığı (${user?.name}'in podcast yayını)`} className={styles.inputField}/>
-                    <Input type="text" set={subject} placeholder={`Podcast'in konusu (sohbet)`} className={styles.inputField}/>
+                    <Input type="text" set={title} placeholder={`Podcast başlığı`} className={styles.inputField}/>
+                    <Input type="text" set={subject} placeholder={`Podcast'in konusu`} className={styles.inputField}/>
                     <Button type={''} onClick={() => testMic()} value={listening ? 'Testi bitir' : 'Mikrofonu test et'} className={styles.inputField}/>
                     <Button onClick={() => handleStartStream()} value={'Podcast yayınını başlat'} className={styles.inputField}/>
                 </div>

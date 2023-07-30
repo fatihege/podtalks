@@ -26,6 +26,12 @@ textarea::selection
   height: 12px
   background: #171717
 
+  @media only screen and (max-width: 768px)
+    width: 0
+    height: 0
+    -webkit-appearance: none
+    appearance: none
+
 ::-webkit-scrollbar-thumb
   border-radius: 6px
   border: 3px solid #171717
@@ -34,10 +40,13 @@ textarea::selection
   &:hover
     background-color: #595959
 
+::-webkit-scrollbar-corner
+  background-color: #171717
+
 html,
 body
   font-size: 16px
-  overflow-x: hidden
+  overflow: hidden
   cursor: default
 
 a
@@ -65,3 +74,7 @@ a
       width: 100%
       height: calc(100vh - 52px)
       overflow-y: auto
+
+      &.paddedContent
+        width: calc(100% - 56px)
+        margin-left: auto

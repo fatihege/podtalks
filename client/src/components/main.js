@@ -1,10 +1,11 @@
-import {useContext, useEffect} from 'react'
+import {useContext, useEffect, useState} from 'react'
 import {NavigationBarContext} from '@/contexts/navigation-bar'
 import Navbar from '@/components/navbar'
 import SidePanel from '@/components/side-panel'
 
 export default function Main({children}) {
     const [menuRef, showMenu, setShowMenu] = useContext(NavigationBarContext)
+    const [width, setWidth] = useState(null)
 
     useEffect(() => {
         const handleClick = e => {
@@ -13,9 +14,12 @@ export default function Main({children}) {
         }
 
         window.addEventListener('click', handleClick)
+        window.addEventListener('resize', () => setWidth(window.innerWidth))
+        setWidth(window.innerWidth)
 
         return () => {
             window.removeEventListener('click', handleClick)
+            window.removeEventListener('resize', () => setWidth(window.innerWidth))
         }
     }, [])
 
@@ -24,7 +28,7 @@ export default function Main({children}) {
             <Navbar/>
             <div className="mainContent">
                 <SidePanel/>
-                <div className="pageContent">
+                <div className={`pageContent ${width > 456 && width <= 950 ? 'paddedContent' : ''}`}>
                     {children}
                 </div>
             </div>
