@@ -1,5 +1,4 @@
 import styles from '@/styles/podcasters-grid.module.sass'
-import {useEffect, useState} from 'react'
 import Link from 'next/link'
 import DefaultProfile from '@/icons/default-profile'
 

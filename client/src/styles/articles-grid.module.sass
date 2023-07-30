@@ -1,0 +1,102 @@
+@import "variables"
+
+.container
+  margin-bottom: 52px
+
+  .title
+    font-size: 24px
+    font-weight: 600
+    color: #eee
+    margin-bottom: 20px
+
+  .grid
+    display: flex
+    flex-wrap: wrap
+    gap: 16px
+
+    .article
+      width: 236px
+      color: #e0e0e0
+      background-color: rgba(28, 28, 28, 0.8)
+      border-radius: 16px
+      padding: 16px
+      cursor: pointer
+      border: 2px solid transparent
+      transition: border-color .15s ease-out
+
+      &:hover
+        border-color: $accentColor
+
+        .articleImage
+          transform: scale(1.05)
+
+      .articleImage
+        height: auto
+        width: 200px
+        margin-bottom: 12px
+        border-radius: 8px
+        transition: transform .15s ease-in-out
+        overflow: hidden
+
+        img
+          height: 100%
+          width: 100%
+          object-fit: cover
+          aspect-ratio: 3/2
+          display: block
+
+        svg
+          width: 100%
+          height: auto
+          aspect-ratio: 3/2
+          display: block
+
+      .articleInfo
+        h3
+          font-size: 18px
+          font-weight: 500
+          color: #eee
+          display: block
+          max-width: 100%
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
+
+        p
+          font-size: 14px
+          font-weight: 400
+          color: #aaa
+          margin-bottom: 0
+
+      .articleAuthor
+        display: flex
+        align-items: center
+        column-gap: 4px
+        margin-top: 2px
+        float: right
+
+        .authorImage
+          width: 24px
+          height: 24px
+          border: 1px solid rgba(65, 65, 65, .6)
+          border-radius: 50%
+          overflow: hidden
+
+          img
+            width: 100%
+            height: 100%
+            object-fit: cover
+            display: block
+
+          svg
+            width: 100%
+            height: auto
+
+        .authorName
+          font-size: 14px
+          font-weight: 500
+          color: #aaa
+          max-width: 120px
+          overflow: hidden
+          text-overflow: ellipsis
+          white-space: nowrap

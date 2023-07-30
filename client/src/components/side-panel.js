@@ -59,6 +59,9 @@ export default function SidePanel() {
                         <Link href={'/explore'} className={router.asPath === '/explore' ? styles.active : ''}>
                             Keşfet
                         </Link>
+                        <Link href={'/articles'} className={router.asPath.startsWith('/articles') ? styles.active : ''}>
+                            Makaleler
+                        </Link>
                         {width <= 470 && (
                             <Link href={'/search'} className={router.asPath.startsWith('/search') ? styles.active : ''}>
                                 Arama yap
