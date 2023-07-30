@@ -27,6 +27,10 @@ export default function Profile({id}) {
         setActiveTab(0)
 
         try {
+            // if (user?.loaded && user?.id && user?.token) {
+            //     const userResponse = await axios.get(`${process.env.API_URL}/user?id=${user?.id}&props=*,followers,following`)
+            //     if (userResponse.data?.status === 'OK') setUser(userResponse.data?.user)
+            // }
             const response = await axios.get(`${process.env.API_URL}/user?id=${id}&props=*,followers,following`)
 
             if (response.data?.status === 'OK') setProfile(response.data?.user)
@@ -38,7 +42,7 @@ export default function Profile({id}) {
 
     useEffect(() => {
         if (!user?.loaded || !user?.id || !user?.token || !profile || profile?.notFound) return
-        if (user?.following?.find(f => f?._id === profile?.id || f?.id === profile?.id)) setIsFollowing(true)
+        if (profile?.followers?.find(f => f?._id === user?.id || f?.id === user?.id)) setIsFollowing(true)
         else setIsFollowing(false)
     }, [user, profile])
 
