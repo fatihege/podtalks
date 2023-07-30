@@ -17,7 +17,7 @@ export default function StartStreamButton() {
                         router.push('/stream') :
                         router.push('/start-stream')) :
                     router.push('/login')}>
-                {isUserStreaming() ? 'Yayınına Dön' : 'Podcast Yayını Aç'}
+                {isUserStreaming() ? 'Yayınına dön' : 'Podcast yayını aç'}
             </button>
         </div>
     )

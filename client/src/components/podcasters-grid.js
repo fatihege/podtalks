@@ -1,46 +1,32 @@
 import styles from '@/styles/podcasters-grid.module.sass'
 import {useEffect, useState} from 'react'
 import Link from 'next/link'
+import DefaultProfile from '@/icons/default-profile'
 
-export default function PodcastersGrid({title = '', noMessage = ''}) {
-    const [podcasters, setPodcasters] = useState([])
-
-    useEffect(() => {
-        let newPodcasters = []
-
-        for (let i = 0; i < 5; i++) {
-            newPodcasters.push({
-                id: i,
-                name: 'Podcaster Adı',
-                podcastName: 'Podcast Adı',
-                image: 'https://picsum.photos/200/200',
-                isLive: Math.random() >= 0.5,
-            })
-        }
-
-        setPodcasters(newPodcasters)
-    }, [])
-
+export default function PodcastersGrid({loaded = true, title = '', noMessage = '', items = []}) {
     return (
         <div className={styles.podcastersGrid}>
             <h2>{title}</h2>
-            <div className={`${styles.grid} ${!podcasters?.length ? styles.empty : ''}`}>
-                {podcasters?.length ? podcasters.map(podcaster => (
-                    <Link href={'/'} className={styles.podcaster} key={podcaster.id}>
-                        {podcaster.isLive ? <span className={styles.liveTag}>Canlı</span> : ''}
+            <div className={`${styles.grid} ${!items?.length ? styles.empty : ''}`}>
+                {items?.length ? items.map(item => (
+                    <Link href={item?.stream ? '/stream/[id]' : '/profile/[id]'}
+                          as={item?.stream ? `/stream/${item?.id || item?._id}` : `/profile/${item?.id || item?._id}`}
+                          className={styles.podcaster} key={item?.id || item?._id}>
+                        {item?.stream ? <span className={styles.liveTag}>Canlı</span> : ''}
                         <div className={styles.podcasterImage}>
-                            <img src={podcaster.image} alt=""/>
+                            {item?.image ? <img src={`${process.env.IMAGE_CDN}/${item.image}`} alt={item?.name}/> :
+                                <DefaultProfile/>}
                         </div>
                         <div className={styles.podcasterInfo}>
-                            <h3 title={podcaster.podcastName}>{podcaster.podcastName}</h3>
-                            <span title={podcaster.name}>{podcaster.name}</span>
+                            <h3 title={item?.stream?.title}>{item?.stream ? item.stream?.title : item?.name}</h3>
+                            {item?.stream ? <span title={item?.name}>{item?.name}</span> : ''}
                         </div>
                     </Link>
-                )) : (
+                )) : loaded ? (
                     <div className={styles.noPodcaster}>
                         <span>{noMessage}</span>
                     </div>
-                )}
+                ) : ''}
             </div>
         </div>
     )

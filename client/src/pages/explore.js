@@ -9,7 +9,7 @@ export default function Explore() {
                 <title>Keşfet - PodTalks</title>
             </Head>
             <div className={styles.container}>
-                <PodcastersGrid title={'En Popüler Podcaster\'lar'} noMessage={'Herhangi bir popüler podcaster bulunamadı.'}/>
+                <PodcastersGrid title={'Yayında olanlar'} noMessage={'Şu an yayın yapan bir podcaster yok.'}/>
             </div>
         </>
     )

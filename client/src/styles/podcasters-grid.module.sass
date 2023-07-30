@@ -25,14 +25,14 @@
 
     .podcaster
       color: #e0e0e0
-      width: 200px
+      width: 220px
       display: flex
       flex-direction: column
       align-items: center
       justify-content: center
       height: 240px
       background-color: rgba(28, 28, 28, 0.8)
-      border-radius: 8px
+      border-radius: 16px
       padding: 16px
       cursor: pointer
       position: relative
@@ -63,13 +63,18 @@
         height: 130px
         width: 130px
         margin-bottom: 16px
-        border-radius: 8px
+        border-radius: 50%
         transition: transform .15s ease-in-out
+        overflow: hidden
 
         img
           height: 100%
           width: 100%
-          border-radius: 8px
+          object-fit: cover
+
+        svg
+          width: 100%
+          height: auto
 
       .podcasterInfo
         text-align: center
@@ -79,7 +84,7 @@
           font-weight: 600
           color: #efefef
           text-align: center
-          max-width: 150px
+          max-width: 180px
           white-space: nowrap
           overflow-x: hidden
           text-overflow: ellipsis

@@ -12,6 +12,7 @@ import Input from '@/components/form/input'
 import Link from 'next/link'
 import SendIcon from '@/icons/send'
 import {AudioRecorder, AudioStreamer} from 'jnaudiostream'
+import EyeIcon from '@/icons/eye'
 
 export function getServerSideProps(context) {
     return {
@@ -42,7 +43,7 @@ export default function StreamPanel({id}) {
     const [micOpen, setMicOpen] = useState(true)
     const [clicked, setClicked] = useState(false)
     const [chatClosed, setChatClosed] = useState(null)
-    const isSpeaking = false
+    const [listeners, setListeners] = useState([])
 
     const getStreamData = async () => {
         try {
@@ -108,12 +109,16 @@ export default function StreamPanel({id}) {
 
         socket.on('connect', async () => {
             if (user?.id === id) socket.emit('createStreamRoom', user?.id)
-            else socket.emit('joinStreamRoom', user?.id, user?.name, streamUser.id)
+            else socket.emit('joinStreamRoom', user?.id, user?.name, streamUser?.id)
 
             setChatClosed(false)
 
             socket.on('color', newColor => {
                 setColor(newColor || 'rgb(255, 255, 255)')
+            })
+
+            socket.on('updateListeners', newListeners => {
+                setListeners(newListeners)
             })
 
             socket.on('voiceBufferHead', async packet => {
@@ -138,8 +143,8 @@ export default function StreamPanel({id}) {
                 setChatLogs(prev => [...prev, {type: 'update', userId, userName}])
             })
 
-            socket.on('closeStream', () => {
-                router.push(`/profile/${streamUser.id}`)
+            socket.on('closeStream', async () => {
+                await router.push(`/profile/${streamUser.id}`)
                 setStreamUser(null)
             })
 
@@ -169,6 +174,8 @@ export default function StreamPanel({id}) {
 
     useEffect(() => {
         if (!streamUser || !user?.loaded) return
+
+        if (streamUser?.id && !streamUser.stream) router.push(`/profile/${streamUser.id}`)
 
         if (user?.id !== id && !streamerRef.current) {
             streamerRef.current = new AudioStreamer(100)
@@ -295,7 +302,7 @@ export default function StreamPanel({id}) {
                             <>
                                 <Input placeholder={'Podcast başlığı'} value={user?.stream?.title?.trim()} set={title}/>
                                 <Input placeholder={'Podcast konusu'} value={user?.stream?.subject?.trim()} set={subject}/>
-                                <Button value={'Kaydet'} onClick={() => handleSave()}/>
+                                <Button value={'Kaydet'} onClick={() => handleSave()} className={styles.submitButton}/>
                             </>
                         ) : (
                             <>
@@ -305,13 +312,18 @@ export default function StreamPanel({id}) {
                             </>
                         )}
                     </div>
+                    {user.loaded && user?.id && (
+                        <div className={styles.listenerCount}>
+                            <EyeIcon strokeRate={1.5}/> {listeners?.length || 0}
+                        </div>
+                    )}
                     <div className={styles.speakers}>
                         {!clicked && user?.id !== id ? (
                             <div className={styles.overlay}>
                                 <Button value={'Dinlemeye başla'} className={styles.overlayButton} onClick={() => setClicked(true)}/>
                             </div>
                         ) : ''}
-                        <div className={`${styles.speaker} ${isSpeaking ? styles.speaking : ''} ${!micOpen ? styles.muted : ''}`}>
+                        <div className={`${styles.speaker} ${!micOpen ? styles.muted : ''}`}>
                             <div className={styles.speakerProfile}>
                                 {streamUser?.image ? <img src={`${process.env.IMAGE_CDN}/${streamUser.image}`} alt={streamUser?.name}/> :
                                     <DefaultProfile/>}
@@ -320,12 +332,28 @@ export default function StreamPanel({id}) {
                         </div>
                     </div>
                     {user?.id === id ? (
-                        <div className={styles.controls}>
-                            <Button value={chatClosed ? 'Sohbeti aç' : 'Sohbeti durdur'} type={''} className={styles.control} onClick={() => handleToggleChat()}/>
-                            <Button value={micOpen ? 'Mikrofonu kapat' : 'Mikrofonu aç'} type={''} className={styles.control} onClick={() => toggleRecording()}/>
-                            <Button value={sure === 0 ? 'Yayını kapat' : sure === 1 ? 'Emin misiniz?' : 'Yayın kapanıyor (iptal edebilirsiniz)'}
-                                    type={'danger'} className={styles.control} onClick={() => handleCloseSure()}/>
-                        </div>
+                        <>
+                            <div className={styles.controls}>
+                                <Button value={chatClosed ? 'Sohbeti aç' : 'Sohbeti durdur'} type={''} className={styles.control} onClick={() => handleToggleChat()}/>
+                                <Button value={micOpen ? 'Mikrofonu kapat' : 'Mikrofonu aç'} type={''} className={styles.control} onClick={() => toggleRecording()}/>
+                                <Button value={sure === 0 ? 'Yayını kapat' : sure === 1 ? 'Emin misiniz?' : 'Yayın kapanıyor (iptal edebilirsiniz)'}
+                                        type={'danger'} className={styles.control} onClick={() => handleCloseSure()}/>
+                            </div>
+                            <div className={styles.listeners}>
+                                <h3 className={styles.title}>Dinleyiciler</h3>
+                                {listeners?.length ? listeners?.map((listener, index) => (
+                                    <div key={index} className={styles.listener}>
+                                        <div className={styles.listenerProfile}>
+                                            {listener?.image ? <img src={`${process.env.IMAGE_CDN}/${listener.image}`} alt={listener?.name}/> :
+                                                <DefaultProfile/>}
+                                        </div>
+                                        <Link href={'/profile/[id]'} as={`/profile/${listener.id}`} className={styles.listenerName} target="_blank">{listener?.name}</Link>
+                                    </div>
+                                )) : (
+                                    <div className={styles.noListener}>Henüz dinleyici yok.</div>
+                                )}
+                            </div>
+                        </>
                     ) : ''}
                 </div>
                 <div className={styles.chatSide}>

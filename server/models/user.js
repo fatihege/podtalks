@@ -23,6 +23,14 @@ const UserSchema = new Schema({
         type: Object,
         default: null,
     },
+    lastListened: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }],
+    hits: {
+        type: Number,
+        default: 0,
+    },
     admin: {
         type: Boolean,
         default: false,

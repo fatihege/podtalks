@@ -50,7 +50,7 @@ export const getUser = async (req, res) => {
             userId = decodedToken.userId
         } else userId = id
 
-        const user = await User.findById(userId, {password: 0}).populate('following')
+        const user = await User.findById(userId, {password: 0}).populate('following lastListened')
 
         if (!user || !user._id) return res.status(404).json({
             status: 'ERROR',
@@ -690,11 +690,6 @@ export const postStartStream = async (req, res) => {
         if (!user) return res.status(404).json({
             status: 'ERROR',
             message: 'Kullanıcı bulunamadı.',
-        })
-
-        if (user.stream) return res.status(400).json({
-            status: 'ERROR',
-            message: 'Kullanıcı zaten yayın yapıyor.',
         })
 
         user.stream = {

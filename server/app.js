@@ -10,8 +10,8 @@ import {join} from 'path'
 import fs from 'fs'
 import checkDir from './utils/check-dir.js'
 import {__dirname} from './utils/dirname.js'
-import User from './models/user.js'
 import randomRGB from './utils/random-rgb.js'
+import User from './models/user.js'
 
 const app = express()
 const server = createServer(app)
@@ -24,7 +24,6 @@ const io = new Server(server, {
 
 const rooms = {}
 const bufferHeaders = {}
-let micClosedRoom = []
 
 io.on('connection', socket => {
     const socketColor = randomRGB()
@@ -32,7 +31,18 @@ io.on('connection', socket => {
     socket.emit('color', socketColor)
 
     socket.on('disconnect', () => {
-        socket.leave(Object.keys(rooms).find(room => rooms[room] === socket.id))
+        const roomId = Object.keys(rooms).find(room => rooms[room]?.listeners?.find(listener => listener.socketId === socket.id))
+        if (roomId) {
+            socket.leave(roomId)
+            if (rooms[roomId]) {
+                rooms[roomId].listeners = rooms[roomId].listeners.filter(listener => listener.socketId !== socket.id)
+                socket.to(roomId).emit('updateListeners', rooms[roomId].listeners)
+            }
+        }
+    })
+
+    socket.on('getListeners', roomId => {
+        if (rooms[roomId]) socket.emit('updateListeners', rooms[roomId].listeners)
     })
 
     socket.on('voiceBufferHead', (streamerId, packet) => {
@@ -49,19 +59,52 @@ io.on('connection', socket => {
             id,
             mic: true,
             chat: true,
+            listeners: [],
         }
         socket.join(id)
         if (!rooms[id]?.mic) socket.emit('micClosed')
         if (!rooms[id]?.chat) socket.emit('chatClosed')
+        socket.emit('updateListeners', rooms[id].listeners)
     })
 
-    socket.on('joinStreamRoom', (userId, userName, streamerId) => {
+    socket.on('joinStreamRoom', async (userId, userName, streamerId) => {
         if (!rooms[streamerId]) return
         socket.join(streamerId)
+
         if (bufferHeaders[streamerId]) socket.emit('voiceBufferHead', bufferHeaders[streamerId])
         if (!rooms[streamerId]?.mic) socket.emit('micClosed')
         if (!rooms[streamerId]?.chat) socket.emit('chatClosed')
         if (userId) socket.to(streamerId).emit('userJoined', userId, userName, socketColor)
+
+        const user = await User.findById(userId, {password: 0}).populate('lastListened')
+        await new Promise(async resolve => {
+            if (user) {
+                if (userId === streamerId) return resolve()
+                if (Array.isArray(rooms[streamerId].listeners) && !rooms[streamerId].listeners.find(l => l.id === userId)) {
+                    rooms[streamerId].listeners.push({
+                        socketId: socket.id,
+                        id: user._id.toString(),
+                        name: user.name,
+                        image: user.image,
+                    })
+                }
+                if (!user.lastListened) user.lastListened = []
+                if (user.lastListened?.find(l => l._id.toString() === streamerId)) return resolve()
+                user.lastListened?.unshift(streamerId)
+                if (user.lastListened?.length > 20) user.lastListened?.slice(0, 20)
+                await user.save()
+                resolve()
+            }
+        })
+
+        socket.to(streamerId).emit('updateListeners', rooms[streamerId].listeners)
+        socket.emit('updateListeners', rooms[streamerId].listeners)
+
+        const streamer = await User.findById(streamerId)
+        if (streamer && rooms[streamerId].listeners?.length && rooms[streamerId].listeners?.length > streamer.hits) {
+            streamer.hits++
+            await streamer.save()
+        }
     })
 
     socket.on('leaveStreamRoom', streamerId => {
@@ -74,6 +117,7 @@ io.on('connection', socket => {
 
     socket.on('closeStream', id => {
         socket.broadcast.to(id).emit('closeStream')
+        delete rooms[id]
     })
 
     socket.on('sendMessage', (userId, userName, message, streamerId) => {
@@ -124,7 +168,7 @@ app.get('/image/:image', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-    res.json({message: 'Hello World!'})
+    res.status(200).json({message: 'Hello there!'})
 })
 
 mongoose.connect(process.env.DB_URI)

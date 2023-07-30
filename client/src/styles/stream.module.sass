@@ -15,30 +15,27 @@
       font-weight: 600
       color: #eeeeee
       width: max-content
-      position: relative
 
       span.title
-        display: inline-block
+        display: block
         max-width: 500px
         white-space: nowrap
         overflow: hidden
         text-overflow: ellipsis
+        line-height: 1
 
       span.subject
         font-size: .9rem
-        font-weight: 700
-        position: absolute
-        left: calc(100% + 8px)
+        color: #eeeeee
         display: inline-block
-        width: max-content
+        padding: 4px 6px
+        border-radius: 6px
+        border: 1px solid #eeeeee
+        margin-top: 4px
         max-width: 300px
         white-space: nowrap
         overflow: hidden
         text-overflow: ellipsis
-        padding: 4px
-        border-radius: 4px
-        background-color: #eeeeee
-        color: #262626
         line-height: 1
 
       .edit
@@ -52,6 +49,27 @@
 
         &:hover
           text-decoration: underline
+
+      .submitButton
+        margin-bottom: 10px
+
+    .listenerCount
+      font-size: .9rem
+      font-weight: 500
+      color: #eeeeee
+      width: max-content
+      display: inline-flex
+      align-items: center
+      column-gap: 3px
+      margin-top: 4px
+      padding: 4px 8px 4px 6px
+      border-radius: 6px
+      background-color: #ff1414
+      line-height: 1
+
+      svg
+        width: 20px
+        height: 20px
 
     .speakers
       position: relative
@@ -127,6 +145,53 @@
 
       .control
         width: 100%
+
+    .listeners
+      margin-top: 20px
+
+      h3.title
+        font-size: 1.2rem
+        font-weight: 600
+        color: #eeeeee
+        margin-bottom: 10px
+
+      .noListener
+        font-size: 14px
+        font-weight: 500
+        color: #eeeeee
+        margin-top: 10px
+
+      .listener
+        display: flex
+        align-items: center
+        column-gap: 8px
+        padding: 6px 12px
+        border-radius: 6px
+        margin-bottom: 2px
+
+        &:hover
+          background: #1f1f1f
+
+        .listenerProfile
+          border-radius: 50%
+          width: 30px
+          height: 30px
+          overflow: hidden
+
+          img
+            width: 100%
+            height: 100%
+            object-fit: cover
+
+          svg
+            width: 100%
+            height: auto
+
+        .listenerName
+          font-size: 14px
+          font-weight: 500
+          color: #eeeeee
+          line-height: 2
 
   .chatSide
     width: 400px
