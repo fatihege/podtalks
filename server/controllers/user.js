@@ -50,7 +50,7 @@ export const getUser = async (req, res) => {
             userId = decodedToken.userId
         } else userId = id
 
-        const user = await User.findById(userId, {password: 0}).populate('following lastListened')
+        const user = await User.findById(userId, {password: 0}).populate('following lastListened bannedUsers')
 
         if (!user || !user._id) return res.status(404).json({
             status: 'ERROR',

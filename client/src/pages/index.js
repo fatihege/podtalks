@@ -42,8 +42,8 @@ export default function Home() {
                 <title>PodTalks</title>
             </Head>
             <div className={styles.container}>
-                <PodcastersGrid loaded={loaded} title={'Aktif podcaster\'lar'} noMessage={'Takip ettiklerin arasında şu an canlı yayında olan bir podcaster yok.'} items={following.filter(f => f.stream)}/>
-                <PodcastersGrid loaded={loaded} title={'Son dinlediklerin'} noMessage={'Son dinlediğin bir podcaster bulunamadı.'} items={lastListened}/>
+                <PodcastersGrid loaded={loaded} title={'Aktif podcaster\'lar'} noMessage={'Takip ettiklerin arasında şu an canlı yayında olan bir podcaster yok.'} items={following.filter(f => f.stream).filter(f => !f?.bannedUsers?.includes(user?.id))}/>
+                <PodcastersGrid loaded={loaded} title={'Son dinlediklerin'} noMessage={'Son dinlediğin bir podcaster bulunamadı.'} items={lastListened.filter(f => !f?.bannedUsers?.includes(user?.id))}/>
                 <PodcastersGrid loaded={loaded} title={'Önerilenler'} noMessage={'Sana önerebileceğimiz herhangi bir podcaster şu anda yok.'}/>
             </div>
         </>

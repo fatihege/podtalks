@@ -13,6 +13,8 @@ import Link from 'next/link'
 import SendIcon from '@/icons/send'
 import {AudioRecorder, AudioStreamer} from 'jnaudiostream'
 import EyeIcon from '@/icons/eye'
+import CloseIcon from '@/icons/close'
+import AddIcon from '@/icons/add'
 
 export function getServerSideProps(context) {
     return {
@@ -47,22 +49,30 @@ export default function StreamPanel({id}) {
 
     const getStreamData = async () => {
         try {
-            const response = await axios.get(`${process.env.API_URL}/user?id=${id}&props=*,stream`)
+            const response = await axios.get(`${process.env.API_URL}/user?id=${id}&props=*,stream,bannedUsers`)
 
             if (response.data?.status === 'OK') {
+                if (user?.id !== id && response.data?.user?.bannedUsers?.find(bannedUser => bannedUser?._id === user?.id)) {
+                    setAlertPopup({
+                        active: true,
+                        title: 'Bu yayına katılamazsınız',
+                        description: 'Yayın sahibi tarafından banlandınız.',
+                        button: 'Tamam',
+                        type: ''
+                    })
+                    router.push('/')
+                    return
+                }
                 setStreamUser(response.data?.user)
                 title.current = response.data?.user?.stream?.title
                 subject.current = response.data?.user?.stream?.subject
-            }
-            else throw new Error()
+            } else throw new Error()
         } catch (e) {
             router.push('/')
         }
     }
 
     useEffect(() => {
-        getStreamData()
-
         return () => {
             if (socketRef.current) {
                 socketRef.current.emit('leaveStreamRoom', streamUser?.id)
@@ -81,6 +91,10 @@ export default function StreamPanel({id}) {
             }
         }
     }, [])
+
+    useEffect(() => {
+        if (user.loaded) getStreamData()
+    }, [user])
 
     useEffect(() => {
         if ((id !== user?.id && !clicked) || socketRef.current || !streamUser || !user?.loaded) return
@@ -168,6 +182,31 @@ export default function StreamPanel({id}) {
 
             socket.on('chatOpened', () => {
                 setChatClosed(false)
+            })
+
+            socket.on('banUser', (userId, {bannedUsers}) => {
+                setStreamUser({
+                    ...streamUser,
+                    bannedUsers,
+                })
+
+                if (user?.id === userId) {
+                    setAlertPopup({
+                        active: true,
+                        title: 'Yayın kapatıldı',
+                        description: 'Yayın sahibi tarafından yayından uzaklaştırıldınız.',
+                        button: 'Tamam',
+                        type: ''
+                    })
+                    return router.push('/')
+                }
+            })
+
+            socket.on('unbanUser', (userId, {bannedUsers}) => {
+                setStreamUser({
+                    ...streamUser,
+                    bannedUsers,
+                })
             })
         })
     }, [clicked, user, recorderRef.current, streamerRef.current, streamUser])
@@ -290,6 +329,16 @@ export default function StreamPanel({id}) {
         }
     }, [sure])
 
+    const handleBan = async userId => {
+        if (!userId || !user?.id || !user?.token || id !== user?.id) return
+        socketRef.current.emit('banUser', id, userId)
+    }
+
+    const handleUnban = async userId => {
+        if (!userId || !user?.id || !user?.token || id !== user?.id) return
+        socketRef.current.emit('unbanUser', id, userId)
+    }
+
     return streamUser ? (
         <>
             <Head>
@@ -301,14 +350,16 @@ export default function StreamPanel({id}) {
                         {editing ? (
                             <>
                                 <Input placeholder={'Podcast başlığı'} value={user?.stream?.title?.trim()} set={title}/>
-                                <Input placeholder={'Podcast konusu'} value={user?.stream?.subject?.trim()} set={subject}/>
+                                <Input placeholder={'Podcast konusu'} value={user?.stream?.subject?.trim()}
+                                       set={subject}/>
                                 <Button value={'Kaydet'} onClick={() => handleSave()} className={styles.submitButton}/>
                             </>
                         ) : (
                             <>
                                 <span className={styles.title}>{streamUser?.stream?.title?.trim()}</span>
                                 <span className={styles.subject}>{streamUser?.stream?.subject?.trim()}</span>
-                                {user?.id === id ? <div className={styles.edit} onClick={() => setEditing(true)}>Düzenle</div> : ''}
+                                {user?.id === id ?
+                                    <div className={styles.edit} onClick={() => setEditing(true)}>Düzenle</div> : ''}
                             </>
                         )}
                     </div>
@@ -320,12 +371,14 @@ export default function StreamPanel({id}) {
                     <div className={styles.speakers}>
                         {!clicked && user?.id !== id ? (
                             <div className={styles.overlay}>
-                                <Button value={'Dinlemeye başla'} className={styles.overlayButton} onClick={() => setClicked(true)}/>
+                                <Button value={'Dinlemeye başla'} className={styles.overlayButton}
+                                        onClick={() => setClicked(true)}/>
                             </div>
                         ) : ''}
                         <div className={`${styles.speaker} ${!micOpen ? styles.muted : ''}`}>
                             <div className={styles.speakerProfile}>
-                                {streamUser?.image ? <img src={`${process.env.IMAGE_CDN}/${streamUser.image}`} alt={streamUser?.name}/> :
+                                {streamUser?.image ?
+                                    <img src={`${process.env.IMAGE_CDN}/${streamUser.image}`} alt={streamUser?.name}/> :
                                     <DefaultProfile/>}
                             </div>
                             <div className={styles.speakerName}>{streamUser?.name}</div>
@@ -334,25 +387,60 @@ export default function StreamPanel({id}) {
                     {user?.id === id ? (
                         <>
                             <div className={styles.controls}>
-                                <Button value={chatClosed ? 'Sohbeti aç' : 'Sohbeti durdur'} type={''} className={styles.control} onClick={() => handleToggleChat()}/>
-                                <Button value={micOpen ? 'Mikrofonu kapat' : 'Mikrofonu aç'} type={''} className={styles.control} onClick={() => toggleRecording()}/>
-                                <Button value={sure === 0 ? 'Yayını kapat' : sure === 1 ? 'Emin misiniz?' : 'Yayın kapanıyor (iptal edebilirsiniz)'}
-                                        type={'danger'} className={styles.control} onClick={() => handleCloseSure()}/>
+                                <Button value={chatClosed ? 'Sohbeti aç' : 'Sohbeti durdur'} type={''}
+                                        className={styles.control} onClick={() => handleToggleChat()}/>
+                                <Button value={micOpen ? 'Mikrofonu kapat' : 'Mikrofonu aç'} type={''}
+                                        className={styles.control} onClick={() => toggleRecording()}/>
+                                <Button
+                                    value={sure === 0 ? 'Yayını kapat' : sure === 1 ? 'Emin misiniz?' : 'Yayın kapanıyor (iptal edebilirsiniz)'}
+                                    type={'danger'} className={styles.control} onClick={() => handleCloseSure()}/>
                             </div>
                             <div className={styles.listeners}>
                                 <h3 className={styles.title}>Dinleyiciler</h3>
-                                {listeners?.length ? listeners?.map((listener, index) => (
+                                {listeners?.length && listeners.filter(l => !streamUser.bannedUsers.find(b => b._id.toString() === l.id))?.length ? listeners?.filter(l => !streamUser.bannedUsers.find(b => b._id.toString() === l.id))?.map((listener, index) => (
                                     <div key={index} className={styles.listener}>
                                         <div className={styles.listenerProfile}>
-                                            {listener?.image ? <img src={`${process.env.IMAGE_CDN}/${listener.image}`} alt={listener?.name}/> :
+                                            {listener?.image ?
+                                                <img src={`${process.env.IMAGE_CDN}/${listener.image}`}
+                                                     alt={listener?.name}/> :
                                                 <DefaultProfile/>}
                                         </div>
-                                        <Link href={'/profile/[id]'} as={`/profile/${listener.id}`} className={styles.listenerName} target="_blank">{listener?.name}</Link>
+                                        <Link href={'/profile/[id]'}
+                                              as={`/profile/${listener?.id || listener?._id}`}
+                                              className={styles.listenerName}
+                                              target="_blank">{listener?.name}</Link>
+                                        <button className={styles.banButton} title="Banla"
+                                                onClick={() => handleBan(listener?.id || listener?._id)}>
+                                            <CloseIcon stroke={'#ff3e3e'} strokeRate={1.5}/>
+                                        </button>
                                     </div>
                                 )) : (
                                     <div className={styles.noListener}>Henüz dinleyici yok.</div>
                                 )}
                             </div>
+                            {user?.id === id && streamUser?.bannedUsers?.length ? (
+                                <div className={styles.listeners}>
+                                    <h3 className={styles.title}>Banlanan dinleyiciler</h3>
+                                    {streamUser?.bannedUsers?.map((listener, index) => (
+                                        <div key={index} className={styles.listener}>
+                                            <div className={styles.listenerProfile}>
+                                                {listener?.image ?
+                                                    <img src={`${process.env.IMAGE_CDN}/${listener.image}`}
+                                                         alt={listener?.name}/> :
+                                                    <DefaultProfile/>}
+                                            </div>
+                                            <Link href={'/profile/[id]'}
+                                                  as={`/profile/${listener?.id || listener?._id}`}
+                                                  className={styles.listenerName}
+                                                  target="_blank">{listener?.name}</Link>
+                                            <button className={styles.banButton} title="Banı kaldır"
+                                                    onClick={() => handleUnban(listener?.id || listener?._id)}>
+                                                <AddIcon stroke={'#3eff6b'} strokeRate={1.5}/>
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : ''}
                         </>
                     ) : ''}
                 </div>
@@ -362,15 +450,23 @@ export default function StreamPanel({id}) {
                             <div key={index} className={styles.log}>
                                 {log.type === 'join' ? (
                                     <div className={styles.join}>
-                                        <Link href={'/profile/[id]'} as={`/profile/${log.userId}`} target="_blank" className={styles.name} style={log.color ? {color: log.color} : {}}>• {log.userName}</Link> sohbete katıldı.
+                                        <Link href={'/profile/[id]'} as={`/profile/${log.userId}`} target="_blank"
+                                              className={styles.name}
+                                              style={log.color ? {color: log.color} : {}}>• {log.userName}</Link> sohbete
+                                        katıldı.
                                     </div>
                                 ) : log.type === 'update' ? (
                                     <div className={styles.update}>
-                                        <Link href={'/profile/[id]'} as={`/profile/${log.userId}`} target="_blank" className={styles.name} style={log.color ? {color: log.color} : {}}>• {log.userName}</Link> yayın bilgilerini güncelledi.
+                                        <Link href={'/profile/[id]'} as={`/profile/${log.userId}`} target="_blank"
+                                              className={styles.name}
+                                              style={log.color ? {color: log.color} : {}}>• {log.userName}</Link> yayın
+                                        bilgilerini güncelledi.
                                     </div>
                                 ) : (
                                     <div className={styles.message}>
-                                        <Link href={'/profile/[id]'} as={`/profile/${log.userId}`} target="_blank" className={styles.name} style={log.color ? {color: log.color} : {}}>{log.userName}</Link> {log.message}
+                                        <Link href={'/profile/[id]'} as={`/profile/${log.userId}`} target="_blank"
+                                              className={styles.name}
+                                              style={log.color ? {color: log.color} : {}}>{log.userName}</Link> {log.message}
                                     </div>
                                 )}
                             </div>
@@ -379,7 +475,8 @@ export default function StreamPanel({id}) {
                     <div className={styles.messageBox}>
                         {user.loaded ? user?.id && user?.token ? user?.id === id || (!chatClosed && chatClosed !== null) ? (
                             <>
-                                <input type="text" placeholder='Bir mesaj yazın...' className={styles.messageInput} ref={messageRef} onKeyDown={checkMessage}/>
+                                <input type="text" placeholder='Bir mesaj yazın...' className={styles.messageInput}
+                                       ref={messageRef} onKeyDown={checkMessage}/>
                                 <button className={styles.sendButton} onClick={() => sendMessage()}>
                                     <SendIcon fill={'#111111'}/>
                                 </button>

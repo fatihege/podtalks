@@ -31,6 +31,10 @@ const UserSchema = new Schema({
         type: Number,
         default: 0,
     },
+    bannedUsers: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }],
     admin: {
         type: Boolean,
         default: false,
