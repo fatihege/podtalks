@@ -3,7 +3,7 @@ import Logo from '@/icons/logo'
 import Link from 'next/link'
 import Search from '@/icons/search'
 import {useRouter} from 'next/router'
-import {useContext} from 'react'
+import {useContext, useRef} from 'react'
 import {AuthContext} from '@/contexts/auth'
 import DefaultProfile from '@/icons/default-profile'
 import {NavigationBarContext} from '@/contexts/navigation-bar'
@@ -13,6 +13,7 @@ export default function Navbar() {
     const router = useRouter()
     const [user, setUser] = useContext(AuthContext)
     const [menuRef, showMenu, setShowMenu] = useContext(NavigationBarContext)
+    const search = useRef('')
 
     const handleShowMenu = () => setShowMenu(!showMenu.current)
 
@@ -20,8 +21,11 @@ export default function Navbar() {
         localStorage.removeItem('token')
         setUser({loaded: true})
         setShowMenu(false)
-        // TODO: Remove this if it's not necessary
         router.reload()
+    }
+
+    const handleSearch = () => {
+        if (search.current?.value?.length > 0) router.push(`/search/${search.current?.value}`)
     }
 
     return (
@@ -41,8 +45,10 @@ export default function Navbar() {
             </div>
             <div className={styles.searchBox}>
                 <div className={styles.searchInput}>
-                    <input type="text" placeholder="Podcaster ara"/>
-                    <button>
+                    <input type="text" placeholder="Podcaster ara" ref={search} onKeyDown={e => {
+                        if (e.key === 'Enter') handleSearch()
+                    }}/>
+                    <button onClick={() => handleSearch()}>
                         <Search stroke={'#1c1c1c'}/>
                     </button>
                 </div>

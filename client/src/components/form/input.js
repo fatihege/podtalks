@@ -12,6 +12,7 @@ import styles from '@/styles/inputs.module.sass'
  * @param {string | null} alert
  * @param {Function: any} onChange
  * @param {Function: any} onBlur
+ * @param {Function: any} onKeyDown
  * @param {Function: any} validator
  * @returns {JSX.Element}
  * @constructor
@@ -27,6 +28,7 @@ export default function Input({
     alert = null,
     onChange = () => {},
     onBlur = () => {},
+    onKeyDown = () => {},
     validator = () => {}
 }) {
     /**
@@ -57,6 +59,7 @@ export default function Input({
         <div
             className={`${styles.input} ${focused ? styles.focused : ''} ${set?.current.length || inputRef.current?.value.length || value?.length ? styles.filled : ''} ${inputAlert || alert ? styles.danger : ''} ${className}`}
             onClick={() => inputRef.current?.focus()}
+            onKeyDown={onKeyDown}
             style={focused ? {zIndex: 1} : {}}>
             <span className={styles.placeholder}>{placeholder}</span>
             <input type={type} name={name} ref={inputRef} onChange={e => {
