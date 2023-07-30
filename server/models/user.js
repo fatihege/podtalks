@@ -35,10 +35,6 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
     }],
-    admin: {
-        type: Boolean,
-        default: false,
-    },
     activated: {
         type: Boolean,
         default: false,

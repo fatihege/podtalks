@@ -21,7 +21,6 @@ export default async (email, password, isPasswordEncrypted = false, userRecord =
             name: user.name,
             image: user.image,
             accepted: user.accepted,
-            admin: user.admin,
             dateOfBirth: user.dateOfBirth,
             createdAt: user.createdAt,
             profileColor: user.profileColor,

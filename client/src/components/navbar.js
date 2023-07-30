@@ -114,11 +114,6 @@ export default function Navbar() {
                                     <Link href={'/account'}>Hesap</Link>
                                 </li>
                                 <li className={styles.separator}></li>
-                                {user.admin ? (
-                                    <li>
-                                        <Link href={'/admin'}>Admin paneli</Link>
-                                    </li>
-                                ) : ''}
                                 <li>
                                     <span onClick={handleLogout}>Çıkış yap</span>
                                 </li>

@@ -64,7 +64,6 @@ export const getUser = async (req, res) => {
             name: user.name,
             image: user.image,
             bio: user.bio,
-            admin: user.admin,
             activated: user.activated,
             stream: user.stream,
             following: user.following,
@@ -149,7 +148,7 @@ export const postRegisterUser = async (req, res) => {
         const activationToken = jwt.sign({email}, process.env.JWT_KEY, {expiresIn: '1h'})
         const encryptedPassword = encrypt(password)
         const count = await User.count({})
-        const user = new User({name, email, password: encryptedPassword, admin: !count, activated: !count, activationToken})
+        const user = new User({name, email, password: encryptedPassword, activated: !count, activationToken})
 
         await user.save()
 
@@ -304,7 +303,7 @@ export const postLoginUser = async (req, res) => {
 
         if (returnErrors(errors, res)) return
 
-        if (!user.activated && !user.admin) errors.push({
+        if (!user.activated) errors.push({
             field: 'email',
             message: 'Bu hesap henüz aktif değil. Lütfen e-posta adresinize gönderilen aktivasyon linkine tıklayarak hesabınızı aktif edin.',
         })
@@ -349,7 +348,7 @@ export const postForgotPassword = async (req, res) => {
             field: 'email',
             message: 'Bu e-posta adresine ait bir kullanıcı bulunamadı.',
         })
-        else if (!user.activated && !user.admin) errors.push({
+        else if (!user.activated) errors.push({
             field: 'email',
             message: 'Bu hesap henüz aktif değil. Lütfen e-posta adresinize gönderilen aktivasyon linkine tıklayarak hesabınızı aktif edin.',
         })
