@@ -100,9 +100,11 @@ export default function Navbar() {
                         </div>
                         <div className={`${styles.menu} ${showMenu.current ? styles.show : ''}`} ref={menuRef}>
                             <ul>
-                                {width <= 1180 && (
+                                {width <= 1180 && !router.asPath.startsWith('/stream') && (
                                     <li>
-                                        <Link href={'/start-stream'}>Yayın başlat</Link>
+                                        <Link href={isUserStreaming() ? '/stream' : '/start-stream'}>
+                                            {isUserStreaming() ? 'Yayınına dön' : 'Podcast yayını aç'}
+                                        </Link>
                                     </li>
                                 )}
                                 <li>
