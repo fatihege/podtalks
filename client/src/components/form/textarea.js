@@ -7,7 +7,7 @@ import styles from '@/styles/inputs.module.sass'
  * @param {string} placeholder
  * @param {string} value
  * @param {string} className
- * @param {'on' | 'off'} autoComplete
+ * @param {number} rows
  * @param {React.MutableRefObject<string>} set
  * @param {string | null} alert
  * @param {Function: any} onChange

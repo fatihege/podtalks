@@ -1,10 +1,13 @@
 import styles from '@/styles/articles.module.sass'
-import {useEffect, useState} from 'react'
+import {useContext, useEffect, useState} from 'react'
 import axios from 'axios'
 import ArticlesGrid from '@/components/articles-grid'
 import Head from 'next/head'
+import {AuthContext} from '@/contexts/auth'
+import Link from 'next/link'
 
 export default function Articles() {
+    const [user] = useContext(AuthContext)
     const [lastCreated, setLastCreated] = useState(null)
     const [mostPopular, setMostPopular] = useState(null)
 
@@ -36,6 +39,11 @@ export default function Articles() {
                 <title>Makaleler - PodTalks</title>
             </Head>
             <div className={styles.container}>
+                {user?.loaded && user?.id && user?.token ? (
+                    <div className={styles.createArticle}>
+                        <Link href={'/articles/create'}>Makale oluştur</Link>
+                    </div>
+                ) : ''}
                 <ArticlesGrid loaded={mostPopular === null} title={'En popülerler'} noMessage={'Herhangi bir makale bulunamadı.'} items={mostPopular}/>
                 <ArticlesGrid loaded={lastCreated === null} title={'Son eklenenler'} noMessage={'Herhangi bir makale bulunamadı.'} items={lastCreated}/>
             </div>

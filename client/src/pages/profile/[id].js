@@ -27,10 +27,6 @@ export default function Profile({id}) {
         setActiveTab(0)
 
         try {
-            // if (user?.loaded && user?.id && user?.token) {
-            //     const userResponse = await axios.get(`${process.env.API_URL}/user?id=${user?.id}&props=*,followers,following`)
-            //     if (userResponse.data?.status === 'OK') setUser(userResponse.data?.user)
-            // }
             const response = await axios.get(`${process.env.API_URL}/user?id=${id}&props=*,followers,following`)
 
             if (response.data?.status === 'OK') setProfile(response.data?.user)
