@@ -68,7 +68,7 @@ export default function Navbar() {
             {width > 470 && (
                 <div className={styles.searchBox}>
                     <div className={styles.searchInput}>
-                        <input type="text" placeholder="Podcaster ara" ref={search} onKeyDown={e => {
+                        <input type="text" placeholder="Podcaster veya makale ara" ref={search} onKeyDown={e => {
                             if (e.key === 'Enter') handleSearch()
                         }}/>
                         <button onClick={() => handleSearch()}>
