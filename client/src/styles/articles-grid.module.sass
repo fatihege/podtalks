@@ -30,6 +30,10 @@
       border: 2px solid transparent
       transition: border-color .15s ease-out
 
+      @media only screen and (max-width: 610px)
+        flex-basis: 100%
+        width: 100%
+
       &:hover
         border-color: $accentColor
 
@@ -38,7 +42,7 @@
 
       .articleImage
         height: auto
-        width: 200px
+        width: 100%
         margin-bottom: 12px
         border-radius: 8px
         transition: transform .15s ease-in-out
