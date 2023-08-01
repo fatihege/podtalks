@@ -39,6 +39,10 @@ const UserSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    admin: {
+        type: Boolean,
+        default: false,
+    },
     activationToken: String,
     passwordResetToken: String,
 }, {

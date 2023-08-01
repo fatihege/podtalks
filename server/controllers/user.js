@@ -67,6 +67,7 @@ export const getUser = async (req, res) => {
             activated: user.activated,
             stream: user.stream,
             following: user.following,
+            admin: user.admin,
             createdAt: user.createdAt,
         }
 

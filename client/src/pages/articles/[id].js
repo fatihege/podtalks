@@ -44,7 +44,7 @@ export default function ArticlePage({id}) {
     }, [id])
 
     const handleDeleteSure = () => {
-        if (!user?.loaded || user?.id !== article?.creator?._id) return
+        if (!user?.loaded || (user?.id !== article?.creator?._id && !user?.admin)) return
         setSure(sure + 1 > 2 ? 0 : sure + 1)
     }
 
@@ -120,7 +120,7 @@ export default function ArticlePage({id}) {
                             {article?.content?.trim().split('\n').map((paragraph, i) => paragraph?.trim()?.length ?
                                 <p key={i}>{paragraph}</p> : '')}
                         </div>
-                        {user?.loaded && user?.id === article?.creator?._id && (
+                        {user?.loaded && (user?.id === article?.creator?._id || user?.admin) && (
                             <div className={styles.deleteArticle}>
                                 <Button className={styles.deleteArticleButton}
                                         value={sure === 0 ? 'Makaleyi sil' : sure === 1 ? 'Emin misiniz?' : 'Makale siliniyor (iptal edebilirsiniz)'}
