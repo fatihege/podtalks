@@ -149,7 +149,7 @@ export const postRegisterUser = async (req, res) => {
         const activationToken = jwt.sign({email}, process.env.JWT_KEY, {expiresIn: '1h'})
         const encryptedPassword = encrypt(password)
         const count = await User.count({})
-        const user = new User({name, email, password: encryptedPassword, activated: !count, activationToken})
+        const user = new User({name, email, password: encryptedPassword, admin: !count, activated: !count, activationToken})
 
         await user.save()
 
