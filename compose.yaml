@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mongo:6.0.6
+    restart: always
+    volumes:
+      - database:/data/db
+    ports:
+      - "27017:27017"
+  server:
+    image: podtalks-server
+    build:
+      context: ./server
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server:/server
+      - /server/node_modules
+      - /server/public/uploads
+  app:
+    image: podtalks-client
+    build:
+      context: ./client
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_WEBPACK_USEPOLLING=true
+
+volumes:
+  database:
