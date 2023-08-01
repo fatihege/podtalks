@@ -96,7 +96,7 @@ export default function Profile({id}) {
             <div className={styles.container}>
                 <div className={styles.profileSection}>
                     <div className={styles.profileImage}>
-                        {profile?.image ? <img src={`${process.env.IMAGE_CDN}/${profile.image}`} alt=""/> :
+                        {profile?.image ? <img src={`${process.env.CDN_URL}/${profile.image}`} alt=""/> :
                             <DefaultProfile/>}
                     </div>
                     <div className={styles.profileInfo}>
@@ -141,7 +141,7 @@ export default function Profile({id}) {
                                 <Link href={'/profile/[id]'} as={`/profile/${follower?._id || follower?.id}`} className={styles.follow} key={follower?._id || follower?.id}>
                                     <div className={styles.followImage}>
                                         {follower?.image ?
-                                            <img src={`${process.env.IMAGE_CDN}/${follower.image}`} alt=""/> :
+                                            <img src={`${process.env.CDN_URL}/${follower.image}`} alt=""/> :
                                             <DefaultProfile/>}
                                     </div>
                                     <div className={styles.followName}>
@@ -156,7 +156,7 @@ export default function Profile({id}) {
                                 <Link href={'/profile/[id]'} as={`/profile/${follow?._id || follow?.id}`} className={styles.follow} key={follow?._id || follow?.id}>
                                     <div className={styles.followImage}>
                                         {follow?.image ?
-                                            <img src={`${process.env.IMAGE_CDN}/${follow.image}`} alt=""/> :
+                                            <img src={`${process.env.CDN_URL}/${follow.image}`} alt=""/> :
                                             <DefaultProfile/>}
                                     </div>
                                     <div className={styles.followName}>

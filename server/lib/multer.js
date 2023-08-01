@@ -6,7 +6,7 @@ import 'dotenv/config'
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const dir = join(__dirname, '..', 'images')
+        const dir = join(__dirname, '..', 'public', 'uploads')
         checkDir(dir)
         cb(null, dir)
     },
@@ -16,4 +16,6 @@ const storage = multer.diskStorage({
     }
 })
 
-export default multer({storage, limits: {fileSize: process.env.PP_MAXSIZE}})
+export const ppUpload = multer({storage, limits: {fileSize: process.env.PP_MAXSIZE}})
+export const apUpload = multer({storage, limits: {fileSize: process.env.AP_MAXSIZE}})
+export const audioUpload = multer({storage, limits: {fileSize: process.env.AUDIO_MAXSIZE}})

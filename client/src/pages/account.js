@@ -215,7 +215,7 @@ export default function AccountPage() {
                     <div className={styles.form}>
                         <div className={styles.profile}>
                             <div className={styles.profileImage}>
-                                {user?.image ? <img src={`${process.env.IMAGE_CDN}/${user.image}`} alt={user.name}/> : <DefaultProfile/>}
+                                {user?.image ? <img src={`${process.env.CDN_URL}/${user.image}`} alt={user.name}/> : <DefaultProfile/>}
                                 <div className={styles.overlay} onClick={() => triggerFileInput()}>
                                     <AddIcon/>
                                     Yükle

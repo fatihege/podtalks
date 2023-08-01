@@ -522,7 +522,7 @@ export const postUpdateProfile = async (req, res) => {
         let newName = user.name
         let newImage = user.image
 
-        const currentImagePath = join(__dirname, '..', 'images', user.image || '_')
+        const currentImagePath = join(__dirname, '..', 'public', 'uploads', user.image || '_')
         if (user.image && fs.existsSync(currentImagePath)) fs.unlinkSync(currentImagePath)
 
         if (checkUserName(name)) newName = name

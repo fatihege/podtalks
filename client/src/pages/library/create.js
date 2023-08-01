@@ -1,28 +1,33 @@
-import styles from '@/styles/create-article.module.sass'
+import styles from '@/styles/create-book.module.sass'
 import Input from '@/components/form/input'
 import {useContext, useEffect, useRef, useState} from 'react'
 import Button from '@/components/form/button'
 import Head from 'next/head'
-import DefaultArticle from '@/icons/default-article'
 import AddIcon from '@/icons/add'
 import {AlertContext} from '@/contexts/alert'
 import {AuthContext} from '@/contexts/auth'
 import {useRouter} from 'next/router'
 import Textarea from '@/components/form/textarea'
 import axios from 'axios'
+import DefaultBook from '@/icons/default-book'
 
-export default function CreateArticle() {
+export default function CreateBook() {
     const router = useRouter()
     const [user] = useContext(AuthContext)
     const [, setAlertPopup] = useState(AlertContext)
     const title = useRef('')
+    const author = useRef('')
     const content = useRef('')
     const [file, setFile] = useState(null)
+    const [audio, setAudio] = useState(null)
     const [image, setImage] = useState(null)
+    const [audioPreview, setAudioPreview] = useState(null)
     const fileRef = useRef()
+    const audioRef = useRef()
     const [disableSubmit, setDisableSubmit] = useState(false)
     const [alert, _setAlert] = useState({
         title: null,
+        author: null,
         content: null,
     })
     const alertRef = useRef(alert)
@@ -34,6 +39,7 @@ export default function CreateArticle() {
 
     useEffect(() => {
         if (user?.loaded && !(user?.id && user?.token)) router.push('/login')
+        if (user?.loaded && !user.admin) router.push('/404')
     }, [user])
 
     useEffect(() => {
@@ -43,6 +49,7 @@ export default function CreateArticle() {
     }, [alertRef.current])
 
     const triggerFileInput = () => fileRef.current?.click()
+    const triggerAudioInput = () => audioRef.current?.click()
 
     const handleFileSelect = e => {
         const file = e.target.files[0]
@@ -68,6 +75,30 @@ export default function CreateArticle() {
         setImage(URL.createObjectURL(file))
     }
 
+    const handleAudioSelect = e => {
+        const file = e.target.files[0]
+        if (!file) return
+
+        if (file.size > process.env.AUDIO_MAXSIZE) return setAlertPopup({
+            active: true,
+            title: 'Dosya boyutu çok büyük',
+            description: 'Maksimum dosya boyutu 15MB olabilir.',
+            button: 'Tamam',
+            type: '',
+        })
+
+        if (file.type.split('/')[0] !== 'audio') return setAlertPopup({
+            active: true,
+            title: 'Dosya tipi desteklenmiyor',
+            description: 'Lütfen bir ses dosyası seçin.',
+            button: 'Tamam',
+            type: '',
+        })
+
+        setAudio(file)
+        setAudioPreview(URL.createObjectURL(file))
+    }
+
     const removeImage = () => {
         setFile(null)
         setImage(null)
@@ -75,9 +106,12 @@ export default function CreateArticle() {
 
     const checkTitle = () => {
         if (!title.current.length) return setAlert({...alertRef.current, title: null})
-
-        if (title.current.trim()?.length < 10) setAlert({...alertRef.current, title: 'Girdiğiniz başlık çok kısa.'})
         else setAlert({...alertRef.current, title: null})
+    }
+
+    const checkAuthor = () => {
+        if (!author.current.length) return setAlert({...alertRef.current, author: null})
+        else setAlert({...alertRef.current, author: null})
     }
 
     const checkContent = () => {
@@ -94,10 +128,12 @@ export default function CreateArticle() {
         try {
             const formData = new FormData()
             formData.append('title', title.current?.trim())
+            formData.append('author', author.current?.trim())
             formData.append('content', content.current?.trim())
             if (file) formData.append('image', file)
+            if (audio) formData.append('audio', audio)
 
-            const response = await axios.post(`${process.env.API_URL}/articles/create?user=${user?.id}`, formData, {
+            const response = await axios.post(`${process.env.API_URL}/library/create?user=${user?.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
@@ -107,11 +143,11 @@ export default function CreateArticle() {
                 setAlertPopup({
                     active: true,
                     title: 'Başarılı',
-                    description: 'Makaleniz başarıyla oluşturuldu.',
+                    description: 'Kitap başarıyla oluşturuldu.',
                     button: 'Tamam',
                     type: 'primary',
                 })
-                if (response.data?.id) await router.push(`/articles/${response.data.id}`)
+                if (response.data?.id) await router.push(`/library/${response.data.id}`)
             } else throw new Error()
         } catch (e) {
             if (e.response && e.response.data.errors && Array.isArray(e.response.data.errors) && e.response.data.errors.length)
@@ -123,7 +159,7 @@ export default function CreateArticle() {
                 setAlertPopup({
                     active: true,
                     title: 'Bir sorun oluştu',
-                    description: 'Makaleniz oluşturulurken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.',
+                    description: 'Kitap oluşturulurken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.',
                     button: 'Tamam',
                     type: ''
                 })
@@ -134,16 +170,16 @@ export default function CreateArticle() {
         }
     }
 
-    return user?.loaded && user?.id && user?.token && (
+    return user?.loaded && user?.admin && (
         <>
             <Head>
-                <title>Makale oluştur - PodTalks</title>
+                <title>Kitap oluştur - PodTalks</title>
             </Head>
             <div className={styles.container}>
-                <h2 className={styles.title}>Makale yazın</h2>
+                <h2 className={styles.title}>Kitap oluşturun</h2>
                 <div className={styles.form}>
                     <div className={styles.imagePreview}>
-                        {image ? <img src={image} alt="Makale önizlemesi"/> : <DefaultArticle/>}
+                        {image ? <img src={image} alt="Kitap önizlemesi"/> : <DefaultBook/>}
                         <div className={styles.overlay} onClick={() => triggerFileInput()}>
                             <AddIcon/>
                             Görsel yükle
@@ -151,9 +187,15 @@ export default function CreateArticle() {
                     </div>
                     {image && <Button type={'danger'} className={styles.removeImage} onClick={() => removeImage()} value="Görseli kaldır"/>}
                     <input type="file" ref={fileRef} className="hide" onChange={handleFileSelect} accept=".png,.jpg,.jpeg"/>
-                    <Input placeholder="Makale başlığı" className={styles.inputField} set={title} alert={alert.title} onChange={checkTitle}/>
-                    <Textarea placeholder="Makale içeriği" className={styles.inputField} set={content} alert={alert.content} rows={15} onBlur={checkContent}/>
-                    <Button value="Makaleyi oluştur" className={styles.inputField} onClick={() => handleSubmit()} disabled={disableSubmit}/>
+                    <div className={styles.audioUpload}>
+                        <Button className={styles.audioUploadButton} onClick={() => triggerAudioInput()} value="Ses dosyası yükle"></Button>
+                        {audioPreview && <audio src={audioPreview} controls></audio>}
+                        <input type="file" ref={audioRef} className="hide" onChange={handleAudioSelect} accept=".mp3"/>
+                    </div>
+                    <Input placeholder="Kitap başlığı" className={styles.inputField} set={title} alert={alert.title} onChange={checkTitle}/>
+                    <Input placeholder="Kitap yazarı" className={styles.inputField} set={author} alert={alert.author} onChange={checkAuthor}/>
+                    <Textarea placeholder="Kitap içeriği" className={styles.inputField} set={content} alert={alert.content} rows={15} onBlur={checkContent}/>
+                    <Button value="Kitap oluştur" className={styles.inputField} onClick={() => handleSubmit()} disabled={disableSubmit}/>
                 </div>
             </div>
         </>

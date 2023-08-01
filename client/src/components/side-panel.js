@@ -62,6 +62,9 @@ export default function SidePanel() {
                         <Link href={'/articles'} className={router.asPath.startsWith('/articles') ? styles.active : ''}>
                             Makaleler
                         </Link>
+                        <Link href={'/library'} className={router.asPath.startsWith('/library') ? styles.active : ''}>
+                            Kütüphane
+                        </Link>
                         {width <= 470 && (
                             <Link href={'/search'} className={router.asPath.startsWith('/search') ? styles.active : ''}>
                                 Arama yap
@@ -96,7 +99,7 @@ export default function SidePanel() {
                                                 <div className={styles.followingItem}>
                                                     <div className={styles.podcasterImage}>
                                                         {podcaster?.image ?
-                                                            <img src={`${process.env.IMAGE_CDN}/${podcaster.image}`}
+                                                            <img src={`${process.env.CDN_URL}/${podcaster.image}`}
                                                                  alt={podcaster?.name}/> : <DefaultProfile/>}
                                                     </div>
                                                     <div className={styles.podcasterName}>{podcaster.name}</div>

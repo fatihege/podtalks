@@ -1,0 +1,94 @@
+@import "variables"
+
+.container
+  margin-bottom: 52px
+
+  .title
+    font-size: 24px
+    font-weight: 600
+    color: #eee
+    margin-bottom: 20px
+
+  .grid
+    display: flex
+    flex-wrap: wrap
+    gap: 16px
+
+    .noBook
+      font-size: .9rem
+      font-weight: 500
+      color: #eee
+      opacity: .8
+
+    .book
+      width: 236px
+      color: #e0e0e0
+      background-color: rgba(28, 28, 28, 0.8)
+      border-radius: 16px
+      padding: 16px
+      cursor: pointer
+      border: 2px solid transparent
+      transition: border-color .15s ease-out
+
+      @media only screen and (max-width: 610px)
+        flex-basis: 100%
+        width: 100%
+
+      &:hover
+        border-color: $accentColor
+
+        .bookImage
+          transform: scale(1.05)
+
+      .bookImage
+        height: auto
+        width: 100%
+        margin-bottom: 12px
+        border-radius: 8px
+        transition: transform .15s ease-in-out
+        overflow: hidden
+
+        img
+          height: 100%
+          width: 100%
+          object-fit: cover
+          aspect-ratio: 1/1.6
+          display: block
+
+        svg
+          width: 100%
+          height: auto
+          aspect-ratio: 1/1.6
+          display: block
+
+      .bookInfo
+        h3
+          font-size: 16px
+          font-weight: 500
+          color: #eee
+          display: block
+          max-width: 100%
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
+
+        p
+          font-size: 14px
+          font-weight: 400
+          color: #aaa
+          margin-bottom: 0
+
+      .bookAuthor
+        display: flex
+        align-items: center
+        margin-top: 2px
+        float: right
+
+        .authorName
+          font-size: 14px
+          font-weight: 500
+          color: #aaa
+          max-width: 120px
+          overflow: hidden
+          text-overflow: ellipsis
+          white-space: nowrap

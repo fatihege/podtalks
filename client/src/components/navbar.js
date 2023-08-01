@@ -68,7 +68,7 @@ export default function Navbar() {
             {width > 470 && (
                 <div className={styles.searchBox}>
                     <div className={styles.searchInput}>
-                        <input type="text" placeholder="Podcaster veya makale ara" ref={search} onKeyDown={e => {
+                        <input type="text" placeholder="Podcaster, makale veya kitap ara" ref={search} onKeyDown={e => {
                             if (e.key === 'Enter') handleSearch()
                         }}/>
                         <button onClick={() => handleSearch()}>
@@ -95,7 +95,7 @@ export default function Navbar() {
                          onClick={() => handleShowMenu()}>
                         <div className={styles.userName}>{user?.name}</div>
                         <div className={styles.profileImage}>
-                            {user?.image ? <img src={`${process.env.IMAGE_CDN}/${user.image}`} alt={user?.name}/> :
+                            {user?.image ? <img src={`${process.env.CDN_URL}/${user.image}`} alt={user?.name}/> :
                                 <DefaultProfile/>}
                         </div>
                         <div className={`${styles.menu} ${showMenu.current ? styles.show : ''}`} ref={menuRef}>

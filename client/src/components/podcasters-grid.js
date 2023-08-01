@@ -13,7 +13,7 @@ export default function PodcastersGrid({loaded = true, title = '', noMessage = '
                           className={styles.podcaster} key={item?.id || item?._id}>
                         {item?.stream ? <span className={styles.liveTag}>Canlı</span> : ''}
                         <div className={styles.podcasterImage}>
-                            {item?.image ? <img src={`${process.env.IMAGE_CDN}/${item.image}`} alt={item?.name}/> :
+                            {item?.image ? <img src={`${process.env.CDN_URL}/${item.image}`} alt={item?.name}/> :
                                 <DefaultProfile/>}
                         </div>
                         <div className={styles.podcasterInfo}>

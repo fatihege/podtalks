@@ -3,6 +3,7 @@ import User from '../models/user.js'
 import {existsSync, unlinkSync} from 'fs'
 import {join} from 'path'
 import {__dirname} from '../utils/dirname.js'
+import Book from '../models/book.js'
 
 const returnErrors = (errors, res) => {
     if (errors.length) {
@@ -16,106 +17,101 @@ const returnErrors = (errors, res) => {
     return false
 }
 
-export const getArticles = async (req, res) => {
+export const getBooks = async (req, res) => {
     try {
         const {sort, order, limit} = req.query
-        const projection = {title: 1, image: 1, content: {$substrCP: ['$content', 0, 50]}}
-        const articles = sort && order ? await Article.find({}, projection).sort({[sort]: order}).populate({
-            path: 'creator',
-            select: 'image name'
-        }).limit(Number(limit) || 50) : await Article.find({}, projection).populate({
-            path: 'creator',
-            select: 'image name'
-        }).limit(Number(limit) || 50)
+        const projection = {title: 1, image: 1, author: 1, content: {$substrCP: ['$content', 0, 50]}}
+        const books = sort && order ?
+            await Book.find({}, projection).sort({[sort]: order}).limit(Number(limit) || 50) :
+            await Book.find({}, projection).limit(Number(limit) || 50)
 
         return res.status(200).json({
             status: 'OK',
-            message: 'Makaleler bulundu.',
-            articles,
+            message: 'Kitaplar bulundu.',
+            books,
         })
     } catch (e) {
         return res.status(500).json({
             status: 'ERROR',
-            message: 'Makaleler aranırken bir hata oluştu.',
+            message: 'Kitaplar aranırken bir hata oluştu.',
             error: e.message,
         })
     }
 }
 
-export const getArticle = async (req, res) => {
+export const getBook = async (req, res) => {
     try {
         const {id} = req.params
-        const article = await Article.findById(id).populate({
-            path: 'creator',
-            select: 'image name'
-        })
+        const book = await Book.findById(id)
 
-        if (!article) return res.status(400).json({
+        if (!book) return res.status(400).json({
             status: 'ERROR',
-            message: 'Makale bulunamadı.',
+            message: 'Kitap bulunamadı.',
         })
 
-        article.hits++
-        await article.save()
+        book.hits++
+        await book.save()
 
         return res.status(200).json({
             status: 'OK',
-            message: 'Makale bulundu.',
-            article,
+            message: 'Kitap bulundu.',
+            book,
         })
     } catch (e) {
         return res.status(500).json({
             status: 'ERROR',
-            message: 'Makale aranırken bir hata oluştu.',
+            message: 'Kitap aranırken bir hata oluştu.',
             error: e.message,
         })
     }
 }
 
-export const deleteArticle = async (req, res) => {
+export const deleteBook = async (req, res) => {
     try {
         const {id} = req.params
-        const article = await Article.findById(id)
+        const book = await Book.findById(id)
 
-        if (!article) return res.status(400).json({
+        if (!book) return res.status(400).json({
             status: 'ERROR',
-            message: 'Makale bulunamadı.',
+            message: 'Kitap bulunamadı.',
         })
 
-        if (article.image) {
-            const imagePath = join(__dirname, '..', 'public', 'uploads', article.image)
+        if (book.image) {
+            const imagePath = join(__dirname, '..', 'public', 'uploads', book.image)
             if (existsSync(imagePath)) unlinkSync(imagePath)
         }
 
-        await Article.deleteOne({_id: id})
+        if (book.audio) {
+            const audioPath = join(__dirname, '..', 'public', 'uploads', book.audio)
+            if (existsSync(audioPath)) unlinkSync(audioPath)
+        }
+
+        await Book.deleteOne({_id: id})
 
         return res.status(200).json({
             status: 'OK',
-            message: 'Makale silindi.',
+            message: 'Kitap silindi.',
         })
     } catch (e) {
         return res.status(500).json({
             status: 'ERROR',
-            message: 'Makale silinirken bir hata oluştu.',
+            message: 'Kitap silinirken bir hata oluştu.',
             error: e.message,
         })
     }
 }
 
-export const postCreateArticle = async (req, res) => {
+export const postCreateBook = async (req, res) => {
     try {
         const {user: creator} = req.query
-        const image = req.file
-        const {title, content} = req.body
+        const image = req.files?.image ? req.files?.image[0]?.filename : null
+        const audio = req.files?.audio ? req.files?.audio[0]?.filename : null
+        const {title, content, author} = req.body
         const errors = []
 
         if (!title) errors.push({
             field: 'title',
             message: 'Başlık boş bırakılamaz.',
-        })
-        else if (title?.trim()?.length < 10) errors.push({
-            field: 'title',
-            message: 'Girdiğiniz başlık çok kısa.',
         })
 
         if (!content) errors.push({
@@ -127,6 +123,11 @@ export const postCreateArticle = async (req, res) => {
             message: 'En az 100 karakterli bir içerik girmelisiniz.',
         })
 
+        if (!author) errors.push({
+            field: 'author',
+            message: 'Yazar boş bırakılamaz.',
+        })
+
         if (returnErrors(errors, res)) return
 
         const user = await User.findById(creator)
@@ -135,22 +136,28 @@ export const postCreateArticle = async (req, res) => {
             message: 'Kullanıcı bulunamadı.',
         })
 
-        const article = await Article.create({
-            image: image?.filename,
+        if (!user.admin) return res.status(403).json({
+            status: 'ERROR',
+            message: 'Bu işlem için yetkiniz yok.',
+        })
+
+        const book = await Book.create({
+            image,
             title: title?.trim(),
             content: content?.trim(),
-            creator,
+            author: author?.trim(),
+            audio,
         })
 
         return res.status(200).json({
             status: 'OK',
-            message: 'Makale oluşturuldu.',
-            id: article.id.toString(),
+            message: 'Kitap oluşturuldu.',
+            id: book.id.toString(),
         })
     } catch (e) {
         return res.status(500).json({
             status: 'ERROR',
-            message: 'Makale oluşturulurken bir hata oluştu.',
+            message: 'Kitap oluşturulurken bir hata oluştu.',
             error: e.message,
         })
     }

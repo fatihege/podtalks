@@ -44,8 +44,8 @@ export default function Articles() {
                         <Link href={'/articles/create'}>Makale oluştur</Link>
                     </div>
                 ) : ''}
-                <ArticlesGrid loaded={mostPopular === null} title={'En popülerler'} noMessage={'Herhangi bir makale bulunamadı.'} items={mostPopular}/>
-                <ArticlesGrid loaded={lastCreated === null} title={'Son eklenenler'} noMessage={'Herhangi bir makale bulunamadı.'} items={lastCreated}/>
+                <ArticlesGrid title={'En popülerler'} noMessage={'Herhangi bir makale bulunamadı.'} items={mostPopular}/>
+                <ArticlesGrid title={'Son eklenenler'} noMessage={'Herhangi bir makale bulunamadı.'} items={lastCreated}/>
             </div>
         </>
     )

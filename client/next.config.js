@@ -3,10 +3,11 @@ const nextConfig = {
     reactStrictMode: true,
     env: {
         API_URL: 'http://localhost:3001/api',
-        IMAGE_CDN: 'http://localhost:3001/image',
+        CDN_URL: 'http://localhost:3001/uploads',
         WS_URL: 'http://localhost:3001',
         PP_MAXSIZE: 5000000,
         AP_MAXSIZE: 5000000,
+        AUDIO_MAXSIZE: 15000000,
     }
 }
 

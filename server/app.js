@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 import userRoutes from './routes/user.js'
 import podcasterRoutes from './routes/podcaster.js'
 import articlesRoutes from './routes/articles.js'
+import libraryRoutes from './routes/library.js'
 import 'dotenv/config'
 import {join} from 'path'
 import fs from 'fs'
@@ -14,6 +15,7 @@ import {__dirname} from './utils/dirname.js'
 import io from './lib/socket.io.js'
 import User from './models/user.js'
 import Article from './models/article.js'
+import Book from './models/book.js'
 
 const app = express()
 const server = createServer(app)
@@ -24,6 +26,7 @@ app.use(cors())
 app.use('/api/user', userRoutes)
 app.use('/api/podcaster', podcasterRoutes)
 app.use('/api/articles', articlesRoutes)
+app.use('/api/library', libraryRoutes)
 app.get('/api/search/:query', async (req, res) => {
     try {
         const {query} = req.params
@@ -40,11 +43,16 @@ app.get('/api/search/:query', async (req, res) => {
             select: 'image name'
         }).sort({hits: -1, createdAt: -1}).limit(50)
 
+        const books = await Book.find({
+            $or: [{title: {$regex: query, $options: 'i'}}, {content: {$regex: query, $options: 'i'}}]
+        }, {title: 1, image: 1, author: 1, content: {$substrCP: ['$content', 0, 50]}}).sort({hits: -1, createdAt: -1}).limit(50)
+
         res.status(200).json({
             status: 'OK',
             message: 'Sonuçlar bulundu.',
             podcasters,
             articles,
+            books,
         })
     } catch (e) {
         res.status(500).json({
@@ -58,19 +66,19 @@ app.get('/api', (req, res) => {
     res.status(200).json({message: 'Hello there!'})
 })
 
-app.get('/image/:image', (req, res) => {
-    const {image} = req.params
-    const dir = join(__dirname, '..', 'images')
-    const imagePath = join(dir, image)
+app.get('/uploads/:file', (req, res) => {
+    const {file} = req.params
+    const dir = join(__dirname, '..', 'public', 'uploads')
+    const filePath = join(dir, file)
 
     checkDir(dir)
 
-    if (!fs.existsSync(imagePath)) return res.status(404).json({
+    if (!fs.existsSync(filePath)) return res.status(404).json({
         status: 'NOT FOUND',
     })
 
     res.setHeader('Cache-Control', 'public, max-age=86400')
-    const stream = fs.createReadStream(imagePath)
+    const stream = fs.createReadStream(filePath)
     stream.pipe(res)
 })
 

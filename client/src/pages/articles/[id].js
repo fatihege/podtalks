@@ -91,13 +91,13 @@ export default function ArticlePage({id}) {
                     <div className={styles.wrapper}>
                         <div className={styles.articleImage}>
                             {article?.image ?
-                                <img src={`${process.env.IMAGE_CDN}/${article.image}`} alt={article?.title}/> :
+                                <img src={`${process.env.CDN_URL}/${article.image}`} alt={article?.title}/> :
                                 <DefaultArticle/>}
                         </div>
                         <div className={styles.articleAuthor}>
                             <div className={styles.articleAuthorImage}>
                                 {article?.creator?.image ?
-                                    <img src={`${process.env.IMAGE_CDN}/${article.creator.image}`}
+                                    <img src={`${process.env.CDN_URL}/${article.creator.image}`}
                                          alt={article?.creator?.name}/> : <DefaultProfile/>}
                             </div>
                             <div className={styles.articleAuthorName}>

@@ -386,7 +386,7 @@ export default function StreamPanel({id}) {
                         <div className={`${styles.speaker} ${!micOpen ? styles.muted : ''}`}>
                             <div className={styles.speakerProfile}>
                                 {streamUser?.image ?
-                                    <img src={`${process.env.IMAGE_CDN}/${streamUser.image}`} alt={streamUser?.name}/> :
+                                    <img src={`${process.env.CDN_URL}/${streamUser.image}`} alt={streamUser?.name}/> :
                                     <DefaultProfile/>}
                             </div>
                             <div className={styles.speakerName}>{streamUser?.name}</div>
@@ -409,7 +409,7 @@ export default function StreamPanel({id}) {
                                     <div key={index} className={styles.listener}>
                                         <div className={styles.listenerProfile}>
                                             {listener?.image ?
-                                                <img src={`${process.env.IMAGE_CDN}/${listener.image}`}
+                                                <img src={`${process.env.CDN_URL}/${listener.image}`}
                                                      alt={listener?.name}/> :
                                                 <DefaultProfile/>}
                                         </div>
@@ -433,7 +433,7 @@ export default function StreamPanel({id}) {
                                         <div key={index} className={styles.listener}>
                                             <div className={styles.listenerProfile}>
                                                 {listener?.image ?
-                                                    <img src={`${process.env.IMAGE_CDN}/${listener.image}`}
+                                                    <img src={`${process.env.CDN_URL}/${listener.image}`}
                                                          alt={listener?.name}/> :
                                                     <DefaultProfile/>}
                                             </div>
