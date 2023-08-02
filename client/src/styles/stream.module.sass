@@ -11,6 +11,9 @@
     width: 100%
     overflow: auto
 
+    @media only screen and (max-width: 456px)
+      padding-bottom: 150px
+
     .streamTitle
       font-size: 1.5rem
       font-weight: 600
@@ -255,6 +258,7 @@
       width: 100%
       border-left: none
       padding-top: 42px
+      padding-bottom: 100px
 
     &.hide
       display: none
@@ -307,6 +311,10 @@
       align-items: center
       border-top: 1px solid #262626
 
+      @media only screen and (max-width: 456px)
+        height: 120px
+        align-items: flex-start
+
       .messageInput
         width: calc(100% - 40px)
         height: 100%
@@ -318,6 +326,9 @@
         font-weight: 500
         padding: 0 16px
 
+        @media only screen and (max-width: 456px)
+          height: 40px
+
         &::placeholder
           color: #b2b2b2
 
@@ -327,6 +338,12 @@
         cursor: pointer
         background: $accentColor
         border: none
+
+        @media only screen and (max-width: 456px)
+          display: flex
+          justify-content: center
+          align-items: flex-start
+          padding-top: 10px
 
         svg
           width: 28px
