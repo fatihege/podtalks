@@ -66,7 +66,7 @@ app.get('/api', (req, res) => {
     res.status(200).json({message: 'Hello there!'})
 })
 
-app.get('/uploads/:file', (req, res) => {
+app.get('/api/uploads/:file', (req, res) => {
     const {file} = req.params
     const dir = join(__dirname, '..', 'public', 'uploads')
     const filePath = join(dir, file)
